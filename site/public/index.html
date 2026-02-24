@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 Insight – 2026 Season Dashboard</title>
+  <meta name="description" content="F1 Insight 2026 Season – The ultimate Formula 1 analytics intelligence platform">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="theme-dark">
+  <div class="fixed-background"></div>
+
+  <!-- AUTH MODAL -->
+  <div id="auth-modal" class="modal-overlay hidden">
+    <div class="auth-card glass-card">
+      <div class="auth-header">
+        <h2>Driver Access</h2>
+        <button id="auth-close" class="modal-close">&times;</button>
+      </div>
+      <div class="auth-body">
+        <div id="auth-error" class="auth-error hidden"></div>
+        <form id="auth-form">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="auth-email" required placeholder="name@f1insight.com" />
+          </div>
+          <div class="form-group">
+            <label>Password</label>
+            <input type="password" id="auth-password" required placeholder="••••••••" />
+          </div>
+          <button type="submit" class="btn-primary w-100" id="auth-submit-btn">
+            <span class="btn-text">Sign In</span>
+          </button>
+        </form>
+        <div class="auth-divider"><span>OR</span></div>
+        <button id="auth-google-btn" class="btn-secondary w-100">
+          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="btn-icon">
+          Sign In with Google
+        </button>
+      </div>
+      <div class="auth-footer">
+        <p>Don't have an account? <a href="#" id="auth-toggle-mode">Sign Up</a></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEAM SELECTION MODAL -->
+  <div id="team-modal" class="modal-overlay hidden">
+    <div class="auth-card glass-card" style="max-width: 500px;">
+      <div class="auth-header">
+        <h2>Select Favorite Team</h2>
+        <button id="team-close" class="modal-close">&times;</button>
+      </div>
+      <div class="auth-body">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; text-align: center;">Personalize
+          your F1 Insight experience.</p>
+        <div class="team-grid-select" id="team-selector-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="navbar-root"></div>
+
+  <main class="main-content">
+    <header class="page-header animate-in">
+      <h1 class="page-title text-gradient-animate">2026 SEASON DASHBOARD</h1>
+      <p class="page-subtitle">Real-time championship intelligence across all 22 drivers and 11 constructors</p>
+    </header>
+
+    <!-- STAT CARDS -->
+    <div class="stats-grid" id="stats-grid"></div>
+
+    <!-- TWO-COLUMN LAYOUT -->
+    <div class="content-grid">
+      <div class="content-left">
+        <!-- Points Progression Chart -->
+        <div class="glass-card animate-in animate-delay-2" style="margin-bottom:24px">
+          <h2 class="section-title">Championship Points Progression</h2>
+          <div class="chart-container">
+            <canvas id="pointsChart"></canvas>
+          </div>
+        </div>
+        <!-- Race Wins Chart -->
+        <div class="glass-card animate-in animate-delay-3">
+          <h2 class="section-title">Race Wins – 2026 Season</h2>
+          <div class="chart-container">
+            <canvas id="winsChart"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="content-right">
+        <!-- Next Race -->
+        <div class="glass-card animate-in animate-delay-2" style="margin-bottom:24px">
+          <div class="next-race-label">NEXT RACE</div>
+          <h3 class="next-race-name">Australian Grand Prix</h3>
+          <p class="next-race-location">📍 Melbourne, Australia · March 16, 2026</p>
+          <div class="countdown-grid" id="countdown">
+            <div class="countdown-item"><span class="countdown-value cd-days">--</span><span
+                class="countdown-label">Days</span></div>
+            <div class="countdown-item"><span class="countdown-value cd-hours">--</span><span
+                class="countdown-label">Hours</span></div>
+            <div class="countdown-item"><span class="countdown-value cd-mins">--</span><span
+                class="countdown-label">Mins</span></div>
+            <div class="countdown-item"><span class="countdown-value cd-secs">--</span><span
+                class="countdown-label">Secs</span></div>
+          </div>
+          <a href="circuits.html" class="btn-primary" style="width:100%;justify-content:center">View Circuit →</a>
+        </div>
+        <!-- Mini Standings -->
+        <div class="glass-card animate-in animate-delay-3">
+          <h3 class="section-title">Driver Standings</h3>
+          <div class="data-table-wrapper">
+            <table class="data-table" id="mini-standings"></table>
+          </div>
+          <div style="text-align:center;margin-top:16px">
+            <a href="drivers.html" class="btn-primary" style="font-size:12px;padding:8px 20px">View Full Standings →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FULL STANDINGS -->
+    <div class="glass-card animate-in animate-delay-4">
+      <h2 class="section-title">2026 Driver Standings</h2>
+      <div class="data-table-wrapper">
+        <table class="data-table" id="full-standings"></table>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="f1data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="auth.js"></script>
+  <script>
+    // ── Render nav & footer ──
+    document.getElementById('navbar-root').innerHTML = renderNavbar('index.html');
+    document.getElementById('footer-root').innerHTML = renderFooter();
+
+    // ── Stat Cards ──
+    const statCards = [
+      { icon: '🏆', label: 'Championship Leader', value: 'Max Verstappen', detail: 'Red Bull Racing', color: 'var(--team-rbr)' },
+      { icon: '⚡', label: 'Fastest Lap Leader', value: 'Lando Norris', detail: 'McLaren F1 Team', color: 'var(--team-mcl)' },
+      { icon: '🏁', label: 'Pole Position Leader', value: 'Charles Leclerc', detail: 'Scuderia Ferrari', color: 'var(--team-fer)' },
+      { icon: '📅', label: 'Races Completed', value: '0 / 24', detail: 'Season starts March 2026', color: 'var(--f1-red)' },
+    ];
+    document.getElementById('stats-grid').innerHTML = statCards.map((s, i) => `
+      <div class="stat-card animate-in animate-delay-${i + 1}" style="--accent:${s.color}">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${s.color};border-radius:16px 16px 0 0"></div>
+        <div class="stat-icon">${s.icon}</div>
+        <div class="stat-label">${s.label}</div>
+        <div class="stat-value">${s.value}</div>
+        <div class="stat-detail">${s.detail}</div>
+      </div>
+    `).join('');
+
+    // ── Mini Standings (Top 10) ──
+    const sorted = F1Data.getSortedDrivers();
+    document.getElementById('mini-standings').innerHTML = `
+      <thead><tr><th>POS</th><th>DRIVER</th><th>TEAM</th><th>PTS</th></tr></thead>
+      <tbody>${sorted.slice(0, 10).map(d => {
+      const tc = F1Data.getTeamColor(d.team);
+      return `<tr>
+          <td class="pos-cell">${d.pos}</td>
+          <td><div class="driver-cell"><span class="team-color-bar" style="background:${tc}"></span><span class="driver-name">${d.name}</span></div></td>
+          <td class="team-cell">${F1Data.getTeamAbbr(d.team)}</td>
+          <td class="points-cell">${d.pts}</td>
+        </tr>`;
+    }).join('')}</tbody>`;
+
+    // ── Full Standings (22 drivers) ──
+    document.getElementById('full-standings').innerHTML = `
+      <thead><tr><th>POS</th><th>DRIVER</th><th>TEAM</th><th>PTS</th><th>WINS</th><th>PODIUMS</th><th>DNFs</th></tr></thead>
+      <tbody>${sorted.map(d => {
+      const tc = F1Data.getTeamColor(d.team);
+      return `<tr>
+          <td class="pos-cell">${d.pos}</td>
+          <td><div class="driver-cell"><span class="team-color-bar" style="background:${tc}"></span><span class="driver-name">${d.name}</span><span class="driver-code">${d.code}</span></div></td>
+          <td class="team-cell">${F1Data.getTeamName(d.team)}</td>
+          <td class="points-cell">${d.pts}</td>
+          <td>${d.wins}</td>
+          <td>${d.podiums}</td>
+          <td>${d.dnfs}</td>
+        </tr>`;
+    }).join('')}</tbody>`;
+
+    // ── Countdown ──
+    initCountdown(new Date('2026-03-16T05:00:00Z').getTime(), 'countdown');
+
+    // ── Charts ──
+    const chartColors = { grid: 'rgba(255,255,255,0.05)', text: '#6a6a7a' };
+
+    // Global Chart.js Polish
+    Chart.defaults.color = '#a0a0b0';
+    Chart.defaults.font.family = 'Inter';
+    Chart.defaults.animation.duration = 1200;
+    Chart.defaults.animation.easing = 'easeOutQuart';
+    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(10, 10, 15, 0.9)';
+    Chart.defaults.plugins.tooltip.borderColor = 'rgba(255, 255, 255, 0.1)';
+    Chart.defaults.plugins.tooltip.borderWidth = 1;
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    Chart.defaults.plugins.tooltip.displayColors = true;
+
+    const defaultOpts = {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#a0a0b0', font: { family: 'Inter', size: 11 } } } },
+      scales: {
+        x: { grid: { color: chartColors.grid }, ticks: { color: chartColors.text, font: { size: 10 } } },
+        y: { grid: { color: chartColors.grid }, ticks: { color: chartColors.text, font: { size: 10 } } },
+      }
+    };
+
+    // Points Progression (simulated preview)
+    const races = Array.from({ length: 24 }, (_, i) => `R${i + 1}`);
+    const topDrivers = sorted.slice(0, 5);
+    new Chart(document.getElementById('pointsChart'), {
+      type: 'line',
+      data: {
+        labels: races,
+        datasets: topDrivers.map(d => ({
+          label: d.name,
+          data: races.map(() => 0),
+          borderColor: F1Data.getTeamColor(d.team),
+          backgroundColor: F1Data.getTeamColor(d.team) + '20',
+          fill: false, tension: 0.3, pointRadius: 0, borderWidth: 2,
+        }))
+      },
+      options: { ...defaultOpts, plugins: { ...defaultOpts.plugins, tooltip: { mode: 'index', intersect: false } } }
+    });
+
+    // Race Wins Bar
+    const top10 = sorted.slice(0, 10);
+    new Chart(document.getElementById('winsChart'), {
+      type: 'bar',
+      data: {
+        labels: top10.map(d => d.code),
+        datasets: [{
+          label: 'Wins',
+          data: top10.map(d => d.wins),
+          backgroundColor: top10.map(d => F1Data.getTeamColor(d.team) + 'cc'),
+          borderColor: top10.map(d => F1Data.getTeamColor(d.team)),
+          borderWidth: 1, borderRadius: 6,
+        }]
+      },
+      options: { ...defaultOpts, indexAxis: 'y', plugins: { ...defaultOpts.plugins, legend: { display: false } } }
+    });
+
+    // ── Init Animations ──
+    animateOnScroll();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drivers – F1 Insight 2026</title>
+    <meta name="description"
+        content="Complete 2026 F1 driver intelligence grid – all 22 drivers with stats, win probability, and analytics">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="navbar-root"></div>
+    <main class="main-content">
+        <header class="page-header animate-in">
+            <h1 class="page-title">DRIVER INTELLIGENCE</h1>
+            <p class="page-subtitle">Complete analytics for all 22 drivers competing in the 2026 Formula 1 World
+                Championship</p>
+        </header>
+        <div class="driver-grid" id="driver-grid"></div>
+    </main>
+    <div id="footer-root"></div>
+    <script src="f1data.js"></script>
+    <script>
+        document.getElementById('navbar-root').innerHTML = renderNavbar('drivers.html');
+        document.getElementById('footer-root').innerHTML = renderFooter();
+
+        const sorted = F1Data.getSortedDrivers();
+        document.getElementById('driver-grid').innerHTML = sorted.map((d, i) => {
+            const tc = F1Data.getTeamColor(d.team);
+            const teamName = F1Data.getTeamName(d.team);
+            const teamAbbr = F1Data.getTeamAbbr(d.team);
+            const recentHtml = d.recent.map(r => {
+                let cls = '';
+                const n = parseInt(r);
+                if (!isNaN(n)) { if (n <= 3) cls = 'top3'; else if (n <= 5) cls = 'top5'; else if (n <= 10) cls = 'top10'; }
+                return `<span class="result-badge ${cls}">${r}</span>`;
+            }).join('');
+            return `
+      <div class="driver-card animate-in" style="animation-delay:${i * 0.05}s">
+        <div class="driver-card-accent" style="background:${tc}"></div>
+        <div class="driver-card-body">
+          <div class="driver-card-header">
+            <div class="driver-card-info">
+              <h3>${d.name}</h3>
+              <span class="team-name" style="color:${tc}">${teamName}</span>
+            </div>
+            <span class="driver-code-badge">${d.code}</span>
+          </div>
+          <div class="driver-position-badge" style="border-color:${tc};background:${tc}20;color:${tc}">P${d.pos}</div>
+          <div class="driver-stats-grid">
+            <div class="driver-stat"><div class="driver-stat-label">Wins</div><div class="driver-stat-value">${d.wins}</div></div>
+            <div class="driver-stat"><div class="driver-stat-label">Podiums</div><div class="driver-stat-value">${d.podiums}</div></div>
+            <div class="driver-stat"><div class="driver-stat-label">DNFs</div><div class="driver-stat-value">${d.dnfs}</div></div>
+            <div class="driver-stat"><div class="driver-stat-label">Points</div><div class="driver-stat-value">${d.pts}</div></div>
+          </div>
+          <div class="win-prob-bar">
+            <div class="win-prob-header">
+              <span class="win-prob-label">Win Probability</span>
+              <span class="win-prob-value" style="color:${tc}">${d.winProb}%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar" data-width="${d.winProb * 5}" style="background:linear-gradient(90deg, ${tc}cc, ${tc}44)"></div>
+            </div>
+          </div>
+          <div class="recent-results">${recentHtml}</div>
+        </div>
+      </div>`;
+        }).join('');
+
+        animateProgressBars();
+        animateOnScroll();
+    </script>
+</body>
+
+</html>

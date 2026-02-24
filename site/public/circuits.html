@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circuits – F1 Insight 2026</title>
+    <meta name="description"
+        content="2026 F1 track analytics – all 24 circuits with technical data and classifications">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div id="navbar-root"></div>
+    <main class="main-content">
+        <header class="page-header animate-in">
+            <h1 class="page-title">TRACK ANALYTICS</h1>
+            <p class="page-subtitle">Complete circuit intelligence for all 24 rounds of the 2026 FIA Formula 1 World
+                Championship</p>
+        </header>
+
+        <!-- Circuit Type Filter -->
+        <div class="tabs" style="margin-bottom:32px" id="circuit-filter">
+            <button class="tab-btn active" data-filter="all">All Circuits</button>
+            <button class="tab-btn" data-filter="High-Speed">High-Speed</button>
+            <button class="tab-btn" data-filter="Technical">Technical</button>
+            <button class="tab-btn" data-filter="Street">Street</button>
+            <button class="tab-btn" data-filter="Street/Park">Street/Park</button>
+        </div>
+
+        <!-- Stats Summary -->
+        <div class="stats-grid" style="margin-bottom:32px">
+            <div class="stat-card animate-in animate-delay-1">
+                <div
+                    style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--f1-red);border-radius:16px 16px 0 0">
+                </div>
+                <div class="stat-icon">🏁</div>
+                <div class="stat-label">Total Rounds</div>
+                <div class="stat-value">24</div>
+            </div>
+            <div class="stat-card animate-in animate-delay-2">
+                <div
+                    style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--team-mcl);border-radius:16px 16px 0 0">
+                </div>
+                <div class="stat-icon">🏙️</div>
+                <div class="stat-label">Street Circuits</div>
+                <div class="stat-value">7</div>
+            </div>
+            <div class="stat-card animate-in animate-delay-3">
+                <div
+                    style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--team-mer);border-radius:16px 16px 0 0">
+                </div>
+                <div class="stat-icon">🏎️</div>
+                <div class="stat-label">High-Speed Tracks</div>
+                <div class="stat-value">6</div>
+            </div>
+            <div class="stat-card animate-in animate-delay-4">
+                <div
+                    style="position:absolute;top:0;left:0;right:0;height:3px;background:var(--team-amr);border-radius:16px 16px 0 0">
+                </div>
+                <div class="stat-icon">🔧</div>
+                <div class="stat-label">Technical Circuits</div>
+                <div class="stat-value">10</div>
+            </div>
+        </div>
+
+        <div class="circuit-grid" id="circuit-grid"></div>
+    </main>
+    <div id="footer-root"></div>
+    <script src="f1data.js"></script>
+    <script>
+        document.getElementById('navbar-root').innerHTML = renderNavbar('circuits.html');
+        document.getElementById('footer-root').innerHTML = renderFooter();
+
+        function renderCircuits(filter) {
+            const circuits = filter === 'all'
+                ? F1Data.circuits
+                : F1Data.circuits.filter(c => c.type === filter);
+
+            document.getElementById('circuit-grid').innerHTML = circuits.map((c, i) => `
+        <div class="circuit-card animate-in" style="animation-delay:${i * 0.05}s" data-type="${c.type}">
+          <div class="circuit-card-header">
+            <div>
+              <h3>${c.name}</h3>
+              <div style="font-size:12px;color:var(--text-secondary);margin-top:4px">📍 ${c.location}, ${c.country}</div>
+            </div>
+            <span class="round-badge">R${String(c.round).padStart(2, '0')}</span>
+          </div>
+          <div class="circuit-card-details">
+            <div class="circuit-detail"><span class="circuit-detail-label">Date</span><span class="circuit-detail-value">${c.date}, 2026</span></div>
+            <div class="circuit-detail"><span class="circuit-detail-label">Circuit Length</span><span class="circuit-detail-value">${c.length}</span></div>
+            <div class="circuit-detail"><span class="circuit-detail-label">Race Laps</span><span class="circuit-detail-value">${c.laps}</span></div>
+            <div class="circuit-detail"><span class="circuit-detail-label">Circuit Type</span><span class="circuit-detail-value" style="color:${c.type.includes('Street') ? 'var(--team-mcl)' : c.type === 'High-Speed' ? 'var(--team-mer)' : 'var(--team-amr)'}">${c.type}</span></div>
+            <div class="circuit-detail"><span class="circuit-detail-label">Race Distance</span><span class="circuit-detail-value">${(c.laps * parseFloat(c.length)).toFixed(1)} km</span></div>
+          </div>
+        </div>
+      `).join('');
+        }
+
+        renderCircuits('all');
+
+        // Filter
+        document.getElementById('circuit-filter').addEventListener('click', e => {
+            if (!e.target.classList.contains('tab-btn')) return;
+            document.querySelectorAll('#circuit-filter .tab-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            renderCircuits(e.target.dataset.filter);
+        });
+
+        animateOnScroll();
+    </script>
+</body>
+
+</html>

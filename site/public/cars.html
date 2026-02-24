@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cars – F1 Insight 2026</title>
+  <meta name="description" content="2026 F1 car performance intelligence – technical data for all 11 constructors">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div id="navbar-root"></div>
+  <main class="main-content">
+    <header class="page-header animate-in">
+      <h1 class="page-title">CAR PERFORMANCE INTELLIGENCE</h1>
+      <p class="page-subtitle">Technical analysis across downforce, drag, ERS, and circuit-type performance for
+        all 11 constructors</p>
+    </header>
+
+    <!-- TEAM TABS -->
+    <div class="tab-group">
+      <div class="tabs" id="car-tabs"></div>
+      <div id="car-tab-contents"></div>
+    </div>
+
+    <!-- COMPARISON SECTION -->
+    <div style="margin-top:48px">
+      <h2 class="section-title animate-in">Performance Comparison</h2>
+      <div class="glass-card animate-in" style="margin-bottom:24px">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">High-Speed Circuit Performance</h3>
+        <div class="chart-container"><canvas id="highSpeedChart"></canvas></div>
+      </div>
+      <div class="glass-card animate-in" style="margin-bottom:24px">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">Street Circuit Performance</h3>
+        <div class="chart-container"><canvas id="streetChart"></canvas></div>
+      </div>
+      <div class="glass-card animate-in" style="margin-bottom:24px">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">Technical Circuit Performance</h3>
+        <div class="chart-container"><canvas id="technicalChart"></canvas></div>
+      </div>
+
+      <!-- Full Comparison Table -->
+      <div class="glass-card animate-in">
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:16px">Full Constructor Comparison</h3>
+        <div class="data-table-wrapper">
+          <table class="data-table" id="comparison-table"></table>
+        </div>
+      </div>
+    </div>
+  </main>
+  <div id="footer-root"></div>
+  <script src="f1data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    document.getElementById('navbar-root').innerHTML = renderNavbar('cars.html');
+    document.getElementById('footer-root').innerHTML = renderFooter();
+
+    // ── Team Tabs ──
+    const metrics = [
+      { key: 'downforce', label: 'Downforce', icon: '⬇️' },
+      { key: 'dragEff', label: 'Drag Efficiency', icon: '💨' },
+      { key: 'ers', label: 'ERS Performance', icon: '⚡' },
+      { key: 'highSpeed', label: 'High-Speed', icon: '🏎️' },
+      { key: 'street', label: 'Street Circuit', icon: '🏙️' },
+      { key: 'technical', label: 'Technical Circuit', icon: '🔧' },
+    ];
+
+    document.getElementById('car-tabs').innerHTML = F1Data.teams.map((t, i) =>
+      `<button class="tab-btn ${i === 0 ? 'active' : ''}" data-tab="car-${t.id}">${t.abbr}</button>`
+    ).join('');
+
+    document.getElementById('car-tab-contents').innerHTML = F1Data.teams.map((t, i) => {
+      const perf = F1Data.carPerformance[t.id];
+      const drivers = F1Data.getDriversByTeam(t.id).map(d => d.name).join(' & ');
+      const statsHtml = metrics.map(m => `
+        <div class="car-stat">
+          <div class="car-stat-header">
+            <span class="car-stat-name">${m.icon} ${m.label}</span>
+            <span class="car-stat-value" style="color:${t.color}">${perf[m.key]}</span>
+          </div>
+          <div class="progress-bar-container">
+            <div class="progress-bar" data-width="${perf[m.key]}" style="background:linear-gradient(90deg, ${t.color}cc, ${t.color}44)"></div>
+          </div>
+        </div>
+      `).join('');
+
+      const avg = Math.round(Object.values(perf).reduce((a, b) => a + b, 0) / 6);
+      return `
+      <div class="tab-content ${i === 0 ? 'active' : ''}" id="car-${t.id}">
+        <div class="glass-card" style="margin-top:20px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:30px">
+            <div style="flex: 1;">
+              <h3 style="font-size:32px;font-weight:700">${t.name}</h3>
+              <div style="font-size:14px;color:var(--text-secondary);margin-top:8px">${drivers}</div>
+            </div>
+            
+            <div style="flex: 2; height: 160px; display: flex; align-items: center; justify-content: center;">
+              <img src="${t.car}" alt="${t.name} 2026 Car" loading="${i === 0 ? 'eager' : 'lazy'}" style="max-height: 100%; max-width: 100%; object-fit: contain; filter: drop-shadow(0px 15px 20px rgba(0,0,0,0.6));" onerror="this.outerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, ${t.color}AA, transparent);border-radius:8px;\\'><img src=\\'' + (F1Data.legacy.teamLogos?.[t.abbr] || F1Data.legacy.teamLogos?.[t.name] || '') + '\\' style=\\'max-height:60px;\\'></div>';">
+            </div>
+
+            <div style="text-align:right; flex: 1;">
+              <div style="font-family:'Orbitron';font-size:36px;font-weight:800;color:${t.color}">${avg}</div>
+              <div style="font-size:12px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px">Overall Rating</div>
+            </div>
+          </div>
+          <div class="car-stats-grid">${statsHtml}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    initTabs();
+    animateProgressBars();
+
+    // ── Charts ──
+    const chartOpts = {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6a6a7a', font: { size: 10 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6a6a7a', font: { size: 10 } }, min: 60, max: 100 },
+      }
+    };
+
+    function makeBarChart(canvasId, dataKey) {
+      new Chart(document.getElementById(canvasId), {
+        type: 'bar',
+        data: {
+          labels: F1Data.teams.map(t => t.abbr),
+          datasets: [{
+            data: F1Data.teams.map(t => F1Data.carPerformance[t.id][dataKey]),
+            backgroundColor: F1Data.teams.map(t => t.color + 'cc'),
+            borderColor: F1Data.teams.map(t => t.color),
+            borderWidth: 1, borderRadius: 6,
+          }]
+        },
+        options: chartOpts
+      });
+    }
+
+    makeBarChart('highSpeedChart', 'highSpeed');
+    makeBarChart('streetChart', 'street');
+    makeBarChart('technicalChart', 'technical');
+
+    // ── Comparison Table ──
+    document.getElementById('comparison-table').innerHTML = `
+      <thead><tr>
+        <th>METRIC</th>
+        ${F1Data.teams.map(t => `<th style="color:${t.color}">${t.abbr}</th>`).join('')}
+      </tr></thead>
+      <tbody>${metrics.map(m => `
+        <tr>
+          <td style="font-weight:600">${m.label}</td>
+          ${F1Data.teams.map(t => {
+      const v = F1Data.carPerformance[t.id][m.key];
+      const best = Math.max(...F1Data.teams.map(x => F1Data.carPerformance[x.id][m.key]));
+      return `<td class="points-cell" style="${v === best ? 'color:' + t.color : ''}">${v}</td>`;
+    }).join('')}
+        </tr>
+      `).join('')}</tbody>`;
+
+    animateOnScroll();
+  </script>
+</body>
+
+</html>

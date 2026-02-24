@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Predictions – F1 Insight 2026</title>
+  <meta name="description"
+    content="AI-powered 2026 F1 predictions – win probability, podium projections, and constructor rankings">
+  <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+  <div id="navbar-root"></div>
+  <main class="main-content">
+    <header class="page-header animate-in">
+      <h1 class="page-title">AI PREDICTIONS</h1>
+      <p class="page-subtitle">Machine learning-powered projections for all 22 drivers and 11 constructors based
+        on historical data and 2026 pre-season analysis</p>
+    </header>
+
+    <!-- Win Probability Model -->
+    <div class="glass-card animate-in" style="margin-bottom:32px">
+      <h2 class="section-title">Win Probability Model</h2>
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:24px">Projected race win probability for
+        each driver based on pre-season analysis, team performance, and historical data</p>
+      <div id="win-prob-list"></div>
+    </div>
+
+    <!-- Podium Prediction -->
+    <div class="glass-card animate-in" style="margin-bottom:32px">
+      <h2 class="section-title">Championship Podium Prediction</h2>
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:24px">Top 6 projected finishers in the
+        2026 Drivers' World Championship</p>
+      <div class="stats-grid" id="podium-grid" style="grid-template-columns:repeat(3,1fr)"></div>
+      <div class="stats-grid" id="podium-grid-2" style="grid-template-columns:repeat(3,1fr);margin-top:12px">
+      </div>
+    </div>
+
+    <!-- Constructor Projection -->
+    <div class="glass-card animate-in">
+      <h2 class="section-title">Constructor Projection</h2>
+      <p style="color:var(--text-secondary);font-size:13px;margin-bottom:24px">Projected constructor standings for
+        the 2026 season based on combined driver and car performance models</p>
+      <div id="constructor-projection"></div>
+    </div>
+  </main>
+  <div id="footer-root"></div>
+  <script src="f1data.js"></script>
+  <script>
+    document.getElementById('navbar-root').innerHTML = renderNavbar('predictions.html');
+    document.getElementById('footer-root').innerHTML = renderFooter();
+
+    // ── Win Probability Model (all 22 drivers) ──
+    const driversByProb = [...F1Data.drivers].sort((a, b) => b.winProb - a.winProb);
+    document.getElementById('win-prob-list').innerHTML = driversByProb.map((d, i) => {
+      const tc = F1Data.getTeamColor(d.team);
+      return `
+      <div class="prediction-item">
+        <span class="prediction-rank">${i + 1}</span>
+        <span class="prediction-driver">
+          <span style="color:${tc};margin-right:8px">●</span>${d.name}
+        </span>
+        <div class="prediction-bar-container">
+          <div class="prediction-bar" style="width:${d.winProb * 5}%;background:linear-gradient(90deg, ${tc}cc, ${tc}33)"></div>
+        </div>
+        <span class="prediction-pct" style="color:${tc}">${d.winProb}%</span>
+      </div>`;
+    }).join('');
+
+    // ── Podium Prediction (Top 6) ──
+    const podiumDrivers = driversByProb.slice(0, 6);
+    const medals = ['🥇', '🥈', '🥉', '4th', '5th', '6th'];
+    const podiumHTML = podiumDrivers.map((d, i) => {
+      const tc = F1Data.getTeamColor(d.team);
+      return `
+      <div class="stat-card" style="text-align:center">
+        <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${tc};border-radius:16px 16px 0 0"></div>
+        <div style="font-size:28px;margin-bottom:8px">${medals[i]}</div>
+        <div class="stat-value" style="font-size:18px">${d.name}</div>
+        <div class="stat-detail" style="color:${tc}">${F1Data.getTeamName(d.team)}</div>
+        <div style="font-family:'Orbitron';font-size:22px;font-weight:800;color:${tc};margin-top:12px">${d.winProb}%</div>
+        <div style="font-size:10px;color:var(--text-tertiary);text-transform:uppercase;letter-spacing:1px">Win Probability</div>
+      </div>`;
+    });
+    document.getElementById('podium-grid').innerHTML = podiumHTML.slice(0, 3).join('');
+    document.getElementById('podium-grid-2').innerHTML = podiumHTML.slice(3).join('');
+
+    // ── Constructor Projection (all 11 teams) ──
+    const teamScores = F1Data.teams.map(t => {
+      const teamDrivers = F1Data.getDriversByTeam(t.id);
+      const totalProb = teamDrivers.reduce((sum, d) => sum + d.winProb, 0);
+      const perf = F1Data.carPerformance[t.id];
+      const avgPerf = Math.round(Object.values(perf).reduce((a, b) => a + b, 0) / 6);
+      return { ...t, totalProb, avgPerf };
+    }).sort((a, b) => b.totalProb - a.totalProb);
+
+    document.getElementById('constructor-projection').innerHTML = teamScores.map((t, i) => {
+      const drivers = F1Data.getDriversByTeam(t.id).map(d => d.name).join(' & ');
+      return `
+      <div class="prediction-item" style="padding:14px 0">
+        <span class="prediction-rank" style="${i < 3 ? 'color:var(--f1-red)' : ''}">${i + 1}</span>
+        <div style="width:200px">
+          <div style="font-weight:700;font-size:14px">${t.name}</div>
+          <div style="font-size:11px;color:var(--text-secondary)">${drivers}</div>
+        </div>
+        <div style="width: 100px; height: 32px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
+           <img src="${t.car}" alt="${t.abbr} Car" loading="lazy" style="max-height:100%; max-width:100%; object-fit:contain; filter:drop-shadow(0px 2px 4px rgba(0,0,0,0.5));" onerror="this.outerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg, ${t.color}44, transparent);border-radius:4px;\\'><img src=\\'' + (F1Data.legacy.teamLogos?.[t.abbr] || F1Data.legacy.teamLogos?.[t.name] || '') + '\\' style=\\'max-height:16px;\\'></div>';">
+        </div>
+        <div class="prediction-bar-container" style="flex:1">
+          <div class="prediction-bar" style="width:${t.totalProb * 2.5}%;background:linear-gradient(90deg, ${t.color}cc, ${t.color}33)"></div>
+        </div>
+        <div style="text-align:right;width:80px">
+          <div style="font-family:'Orbitron';font-size:14px;font-weight:700;color:${t.color}">${t.totalProb.toFixed(1)}%</div>
+          <div style="font-size:9px;color:var(--text-tertiary)">Avg: ${t.avgPerf}</div>
+        </div>
+      </div>`;
+    }).join('');
+
+    animateOnScroll();
+  </script>
+</body>
+
+</html>
