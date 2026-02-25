@@ -1,58 +1,51 @@
-import { f1Auth as auth, f1SignIn as signInWithEmailAndPassword, f1SignUp as createUserWithEmailAndPassword, f1SignInGoogle as signInWithGoogle, f1SignOut as signOut, f1OnAuthStateChanged as onAuthStateChanged, f1Db as db, f1Doc as doc, f1SetDoc as setDoc, f1GetDoc as getDoc } from './lib/firebase.js';
+import { f1Auth as auth, f1Db as db, f1Doc as doc, f1SetDoc as setDoc, f1GetDoc as getDoc } from './lib/firebase.js';
+import { authService } from './lib/authService.js';
 import { syncPersonalizationState, openTeamModal } from './lib/personalization.js';
 
-// Reactive getters for DOM elements to prevent initialization race conditions
-const getModal = () => document.getElementById('auth-modal');
-const getCloseBtn = () => document.getElementById('auth-close');
-const getForm = () => document.getElementById('auth-form');
-const getEmailInput = () => document.getElementById('auth-email');
-const getPassInput = () => document.getElementById('auth-password');
-const getSubmitBtn = () => document.getElementById('auth-submit-btn');
-const getGoogleBtn = () => document.getElementById('auth-google-btn');
-const getToggleModeBtn = () => document.getElementById('auth-toggle-mode');
-const getErrorBox = () => document.getElementById('auth-error');
+// Legacy Auth Modal DOM getters removed.
 
-let isSignUpMode = false;
-
-// Render Navbar State
-onAuthStateChanged(auth, async (user) => {
-    const navAuthContainer = document.getElementById('nav-auth-container');
-    if (navAuthContainer) {
-        if (user) {
-            const displayName = user.displayName || 'Fan';
-            const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
-            navAuthContainer.innerHTML = `
-          <div class="user-profile">
-            <span class="nav-user-name">${displayName}</span>
-            <div class="user-avatar">${initial}</div>
-            <div class="user-dropdown">
-              <div class="user-info">
-                <span class="user-name">${displayName}</span>
-                <span class="user-email">${user.email}</span>
+// Wait for inline rendering to finish injecting the container
+document.addEventListener('DOMContentLoaded', () => {
+    // Render Navbar State
+    authService.initAuthListener(async (user) => {
+        const navAuthContainer = document.getElementById('nav-auth-container');
+        if (navAuthContainer) {
+            if (user) {
+                const displayName = user.displayName || 'Fan';
+                const initial = (user.displayName || user.email || 'U')[0].toUpperCase();
+                navAuthContainer.innerHTML = `
+              <div class="user-profile">
+                <span class="nav-user-name">${displayName}</span>
+                <div class="user-avatar">${initial}</div>
+                <div class="user-dropdown">
+                  <div class="user-info">
+                    <span class="user-name">${displayName}</span>
+                    <span class="user-email">${user.email}</span>
+                  </div>
+                  <a href="#" class="dropdown-item" id="btn-settings">Favorite Team</a>
+                  <a href="#" class="dropdown-item" id="btn-logout">Sign Out</a>
+                </div>
               </div>
-              <a href="#" class="dropdown-item" id="btn-settings">Favorite Team</a>
-              <a href="#" class="dropdown-item" id="btn-logout">Sign Out</a>
-            </div>
-          </div>
-        `;
-            document.getElementById('btn-logout').addEventListener('click', (e) => {
-                e.preventDefault();
-                syncPersonalizationState(null);
-                signOut(auth);
-            });
-            document.getElementById('btn-settings').addEventListener('click', (e) => {
-                e.preventDefault();
-                openTeamModal();
-            });
+            `;
+                document.getElementById('btn-logout').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    syncPersonalizationState(null);
+                    authService.logout();
+                });
+                document.getElementById('btn-settings').addEventListener('click', (e) => {
+                    e.preventDefault();
+                    openTeamModal();
+                });
 
-            // Hand over UI accent synchronization parsing to Personalization Module
-            await syncPersonalizationState(user);
-        } else {
-            navAuthContainer.innerHTML = `<button class="btn-primary btn-sm" id="btn-login-modal">Login / Sign Up</button>`;
-            document.getElementById('btn-login-modal').addEventListener('click', openModal);
-            syncPersonalizationState(null);
+                // Hand over UI accent synchronization parsing to Personalization Module
+                await syncPersonalizationState(user);
+            } else {
+                navAuthContainer.innerHTML = `<button class="btn-primary btn-sm" id="btn-login-modal">Login / Sign Up</button>`;
+                document.getElementById('btn-login-modal').addEventListener('click', openModal);
+                syncPersonalizationState(null);
+            }
         }
-    }
+    });
 });
 
 // ─────────────────────────────────────────────────────────
@@ -145,146 +138,19 @@ const attachNotificationListener = (user) => {
 attachNotificationListener(null);
 
 // Bind into the global auth change layer
-onAuthStateChanged(auth, user => {
+authService.initAuthListener(user => {
     attachNotificationListener(user);
 });
 
-// Auth Modal Logic
+// Auth Modal Logic mapped to React Island
 function openModal() {
-    const modal = getModal();
-    if (!modal) return;
-    modal.classList.remove('hidden');
-    // small delay for transition
-    setTimeout(() => modal.classList.add('visible'), 10);
-}
-
-function closeModal() {
-    const modal = getModal();
-    const errorBox = getErrorBox();
-    if (modal) {
-        modal.classList.remove('visible');
-        setTimeout(() => modal.classList.add('hidden'), 300);
-    }
-    if (errorBox) errorBox.classList.add('hidden');
+    window.dispatchEvent(new CustomEvent('open-auth-modal'));
 }
 
 // Defer Event Listener Attachments until interaction or mutation observation
 document.body.addEventListener('click', (e) => {
     // Modal toggling delegation
     if (e.target.closest('#btn-login-modal')) openModal();
-    if (e.target.closest('#auth-close')) closeModal();
-    if (e.target === getModal()) closeModal();
     if (e.target.closest('#team-close')) closeTeamModal();
-
-    // Toggle Mode
-    const toggleBtn = e.target.closest('#auth-toggle-mode');
-    if (toggleBtn) {
-        e.preventDefault();
-        isSignUpMode = !isSignUpMode;
-        document.querySelector('.auth-header h2').textContent = isSignUpMode ? 'Create Account' : 'Driver Access';
-
-        const submitBtn = getSubmitBtn();
-        if (submitBtn) submitBtn.querySelector('.btn-text').textContent = isSignUpMode ? 'Sign Up' : 'Sign In';
-
-        toggleBtn.textContent = isSignUpMode ? 'Sign In' : 'Sign Up';
-        toggleBtn.parentElement.firstChild.textContent = isSignUpMode ? 'Already have an account? ' : "Don't have an account? ";
-
-        const errorBox = getErrorBox();
-        if (errorBox) errorBox.classList.add('hidden');
-    }
-
-    // Google Auth delegation
-    if (e.target.closest('#auth-google-btn')) {
-        e.preventDefault();
-        handleGoogleAuth();
-    }
 });
-
-// Handle Form Submission via delegation
-document.body.addEventListener('submit', async (e) => {
-    const form = getForm();
-    if (e.target === form) {
-        e.preventDefault();
-        const emailInput = getEmailInput();
-        const passInput = getPassInput();
-        if (!emailInput || !passInput) return;
-
-        const email = emailInput.value;
-        const pass = passInput.value;
-
-        setLoading(true);
-        const errorBox = getErrorBox();
-        if (errorBox) errorBox.classList.add('hidden');
-
-        try {
-            let cred;
-            if (isSignUpMode) {
-                cred = await createUserWithEmailAndPassword(auth, email, pass);
-                await initializeUserDoc(cred.user);
-            } else {
-                cred = await signInWithEmailAndPassword(auth, email, pass);
-            }
-            closeModal();
-        } catch (err) {
-            showError(err.message);
-        } finally {
-            setLoading(false);
-        }
-    }
-});
-
-async function handleGoogleAuth() {
-    setLoading(true);
-    const errorBox = getErrorBox();
-    if (errorBox) errorBox.classList.add('hidden');
-    try {
-        const cred = await signInWithGoogle();
-        await initializeUserDoc(cred.user);
-        closeModal();
-    } catch (err) {
-        showError(err.message);
-    } finally {
-        setLoading(false);
-    }
-}
-
-// Helpers
-function setLoading(isLoading) {
-    const submitBtn = getSubmitBtn();
-    const googleBtn = getGoogleBtn();
-    if (submitBtn) submitBtn.disabled = isLoading;
-    if (googleBtn) googleBtn.disabled = isLoading;
-
-    if (submitBtn) {
-        const btnText = submitBtn.querySelector('.btn-text');
-        if (isLoading) {
-            btnText.dataset.original = btnText.textContent;
-            btnText.textContent = 'Processing...';
-        } else {
-            btnText.textContent = btnText.dataset.original || 'Sign In';
-        }
-    }
-}
-
-function showError(msg) {
-    const errorBox = getErrorBox();
-    if (errorBox) {
-        errorBox.textContent = msg;
-        errorBox.classList.remove('hidden');
-    }
-}
-
-async function initializeUserDoc(user) {
-    const userRef = doc(db, 'users', user.uid);
-    await setDoc(userRef, {
-        displayName: user.displayName || 'F1 Fan',
-        email: user.email,
-        favoriteTeam: 'None',
-        createdAt: new Date().toISOString(),
-        preferences: {
-            reducedMotion: false
-        }
-    }, { merge: true });
-}
-
 

@@ -1,0 +1,49 @@
+query ListRecentNewsArticles @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public as it retrieves general news.") {
+  newsArticles(orderBy: [{publishedAt: DESC}], limit: 10) {
+    id
+    title
+    publishedAt
+    sourceUrl
+    imageUrl
+    author
+    constructor {
+      name
+      nationality
+    }
+  }
+}
+
+query GetDriverProfile($driverId: UUID!) @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public as it retrieves general driver information.") {
+  driver(id: $driverId) {
+    id
+    firstName
+    lastName
+    driverNumber
+    nationality
+    dateOfBirth
+    biography
+    photoUrl
+  }
+}
+
+mutation CreateNewUser($displayName: String!, $email: String) @auth(level: USER_ANON, insecureReason: "This operation is safe to expose to all logged in users, as it creates a user profile tied to their authentication.") {
+  user_insert(data: {
+    id_expr: "auth.uid",
+    displayName: $displayName,
+    email: $email,
+    createdAt_expr: "request.time"
+  }) {
+    id
+  }
+}
+
+mutation FollowDriver($driverId: UUID!) @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users, as it records a user's preference to follow a driver.") {
+  userFollowsDriver_insert(data: {
+    userId_expr: "auth.uid",
+    driverId: $driverId,
+    createdAt_expr: "request.time"
+  }) {
+    userId
+    driverId
+  }
+}

@@ -12,39 +12,7 @@
 <body class="theme-dark">
   <div class="fixed-background"></div>
 
-  <!-- AUTH MODAL -->
-  <div id="auth-modal" class="modal-overlay hidden">
-    <div class="auth-card glass-card">
-      <div class="auth-header">
-        <h2>Driver Access</h2>
-        <button id="auth-close" class="modal-close">&times;</button>
-      </div>
-      <div class="auth-body">
-        <div id="auth-error" class="auth-error hidden"></div>
-        <form id="auth-form">
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="auth-email" required placeholder="name@f1insight.com" />
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="auth-password" required placeholder="••••••••" />
-          </div>
-          <button type="submit" class="btn-primary w-100" id="auth-submit-btn">
-            <span class="btn-text">Sign In</span>
-          </button>
-        </form>
-        <div class="auth-divider"><span>OR</span></div>
-        <button id="auth-google-btn" class="btn-secondary w-100">
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="btn-icon">
-          Sign In with Google
-        </button>
-      </div>
-      <div class="auth-footer">
-        <p>Don't have an account? <a href="#" id="auth-toggle-mode">Sign Up</a></p>
-      </div>
-    </div>
-  </div>
+  <!-- AUTH MODAL MOVED TO REACT -->
 
   <!-- TEAM SELECTION MODAL -->
   <div id="team-modal" class="modal-overlay hidden">
@@ -123,12 +91,10 @@
       </div>
     </div>
 
-    <!-- FULL STANDINGS -->
+    <!-- FULL STANDINGS FRONTEND INJECTED VIA PRIMEREACT ISLAND -->
     <div class="glass-card animate-in animate-delay-4">
       <h2 class="section-title">2026 Driver Standings</h2>
-      <div class="data-table-wrapper">
-        <table class="data-table" id="full-standings"></table>
-      </div>
+      <div id="full-standings-react-root"></div>
     </div>
   </main>
 
@@ -173,21 +139,7 @@
         </tr>`;
     }).join('')}</tbody>`;
 
-    // ── Full Standings (22 drivers) ──
-    document.getElementById('full-standings').innerHTML = `
-      <thead><tr><th>POS</th><th>DRIVER</th><th>TEAM</th><th>PTS</th><th>WINS</th><th>PODIUMS</th><th>DNFs</th></tr></thead>
-      <tbody>${sorted.map(d => {
-      const tc = F1Data.getTeamColor(d.team);
-      return `<tr>
-          <td class="pos-cell">${d.pos}</td>
-          <td><div class="driver-cell"><span class="team-color-bar" style="background:${tc}"></span><span class="driver-name">${d.name}</span><span class="driver-code">${d.code}</span></div></td>
-          <td class="team-cell">${F1Data.getTeamName(d.team)}</td>
-          <td class="points-cell">${d.pts}</td>
-          <td>${d.wins}</td>
-          <td>${d.podiums}</td>
-          <td>${d.dnfs}</td>
-        </tr>`;
-    }).join('')}</tbody>`;
+    // ── Full Standings mapped to PrimeReact Island ──
 
     // ── Countdown ──
     initCountdown(new Date('2026-03-16T05:00:00Z').getTime(), 'countdown');
@@ -254,6 +206,9 @@
     // ── Init Animations ──
     animateOnScroll();
   </script>
+
+  <script type="module" src="/lib/components/mountReact.jsx"></script>
+  <script type="module" src="auth.js"></script>
 </body>
 
 </html>

@@ -111,6 +111,9 @@ const F1Data = {
   getSortedDrivers() { return [...this.drivers].sort((a, b) => a.pos - b.pos); },
 };
 
+// Export to window
+window.F1Data = F1Data;
+
 // ─── Navigation HTML Generator ───
 function renderNavbar(activePage) {
   const pages = [

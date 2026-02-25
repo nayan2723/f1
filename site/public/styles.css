@@ -4,6 +4,7 @@
    ============================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
 
 /* ---------- CSS Custom Properties ---------- */
 :root {
@@ -2665,4 +2666,70 @@ body::after {
 .user-avatar {
   background: var(--team-accent, var(--f1-red));
   box-shadow: 0 0 12px var(--team-accent-glow, transparent);
+}
+
+/* ---------- Authentication & Utilities ---------- */
+.hidden {
+  display: none !important;
+}
+
+.auth-error {
+  background: rgba(225, 6, 0, 0.1);
+  border: 1px solid rgba(225, 6, 0, 0.3);
+  color: var(--f1-red);
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 16px;
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Compare View Headshots */
+.driver-headshot-container {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--surface-bg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.driver-headshot {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Tooltip Styles */
+.tooltip-container {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip-container .tooltip-text {
+  display: none;
+  width: max-content;
+  background-color: var(--surface-bg);
+  color: var(--text-primary);
+  text-align: center;
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  position: absolute;
+  z-index: 100;
+  bottom: 125%;
+  /* Position above button */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.3s;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+}
+
+.tooltip-container:hover .tooltip-text {
+  opacity: 1;
 }

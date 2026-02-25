@@ -46,14 +46,16 @@ export async function syncPersonalizationState(user) {
         if (docSnap.exists()) {
             const data = docSnap.data();
             currentFavoriteTeam = data.favoriteTeam || 'None';
-
-            if (currentFavoriteTeam === 'None') {
-                openTeamModal();
-            } else {
-                applyTeamPersonalization(currentFavoriteTeam);
-            }
-            return currentFavoriteTeam;
+        } else {
+            currentFavoriteTeam = 'None';
         }
+
+        if (currentFavoriteTeam === 'None') {
+            openTeamModal();
+        } else {
+            applyTeamPersonalization(currentFavoriteTeam);
+        }
+        return currentFavoriteTeam;
     } catch (e) {
         console.error("Error fetching personalization state", e);
     }

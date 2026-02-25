@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+/* 
+  Scope all Tailwind utility classes inside the islands-root class
+  so they absolutely cannot leak and break the vanilla F1 Insight UI
+*/
+@theme {
+  --color-f1-red: #E10600;
+  --color-surface-bg: rgba(15, 17, 21, 0.65);
+  --radius-sm: 8px;
+}
+
+@utility radix-content {
+  background: var(--color-surface-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* PrimeReact Data Table Overrides - Glassmorphism Integration */
+.custom-f1-table .p-datatable-wrapper {
+  background: transparent;
+  border-radius: var(--radius-sm);
+}
+
+.custom-f1-table .p-datatable-header,
+.custom-f1-table .p-datatable-table {
+  background: transparent;
+}
+
+.custom-f1-table .p-datatable-tbody>tr {
+  background: rgba(15, 17, 21, 0.4);
+  color: white;
+  transition: background 0.2s;
+}
+
+.custom-f1-table .p-datatable.p-datatable-striped .p-datatable-tbody>tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.custom-f1-table .p-datatable-tbody>tr:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+
+.custom-f1-table .p-datatable-tbody>tr>td {
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.custom-f1-table .p-datatable-thead>tr>th {
+  background: rgba(10, 12, 16, 0.8);
+  color: rgba(255, 255, 255, 0.5);
+  border-color: rgba(255, 255, 255, 0.1);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.custom-f1-table .p-paginator {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.1);
+  border-bottom-left-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.custom-f1-table .p-paginator .p-paginator-pages .p-paginator-page,
+.custom-f1-table .p-paginator .p-paginator-first,
+.custom-f1-table .p-paginator .p-paginator-prev,
+.custom-f1-table .p-paginator .p-paginator-next,
+.custom-f1-table .p-paginator .p-paginator-last {
+  color: rgba(255, 255, 255, 0.6);
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+}
+
+.custom-f1-table .p-paginator .p-paginator-pages .p-paginator-page.p-highlight {
+  background: rgba(225, 6, 0, 0.2);
+  color: #E10600;
+  border-color: transparent;
+}
+
+.custom-f1-table .p-paginator .p-paginator-page:not(.p-highlight):hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}

@@ -1,4 +1,5 @@
 import { f1Auth, f1Db, f1Doc, f1SetDoc } from './lib/firebase.js';
+import { animate } from 'motion';
 
 document.addEventListener('DOMContentLoaded', () => {
     const driverASelect = document.getElementById('driver-a-select');
@@ -10,9 +11,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const drivers = window.F1Data.drivers;
     let radarChart = null;
+    let currentAuthUser = null;
+
+    // Phase 6: Sync Auth State reliably
+    import('./lib/authService.js').then(module => {
+        module.authService.initAuthListener(user => {
+            currentAuthUser = user;
+            updateSaveButtonStatus();
+        });
+    });
+
+    const driverAImg = document.querySelector('#driver-a-headshot img');
+    const driverBImg = document.querySelector('#driver-b-headshot img');
+    const driverAContainer = document.getElementById('driver-a-headshot');
+    const driverBContainer = document.getElementById('driver-b-headshot');
+    const swapBtn = document.getElementById('swap-drivers-btn');
+    const saveBtn = document.getElementById('save-compare-btn');
+    const saveTooltip = document.getElementById('save-compare-tooltip');
 
     // Initialize Selects
-    const optionsHTML = drivers.map(d => `<option value="${d.id}">${d.name} (${d.team})</option>`).join('');
+    const optionsHTML = drivers.map(d => `<option value="${d.code.toLowerCase()}">${d.name} (${d.team})</option>`).join('');
     driverASelect.innerHTML = optionsHTML;
     driverBSelect.innerHTML = optionsHTML;
 
@@ -31,10 +49,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         lastA = valA; lastB = valB;
 
-        const drvA = drivers.find(d => d.id === valA);
-        const drvB = drivers.find(d => d.id === valB);
+        const drvA = drivers.find(d => d.id === valA || d.code.toLowerCase() === valA.toLowerCase());
+        const drvB = drivers.find(d => d.id === valB || d.code.toLowerCase() === valB.toLowerCase());
+
+        if (!drvA || !drvB) return;
+
         const colorA = window.F1Data.getTeamColor(drvA.team);
         const colorB = window.F1Data.getTeamColor(drvB.team);
+
+        // Update UI Accents & Headshots
+        // Attempting to match the F1Data legends/historic driver portrait names or fallback
+        const portraitA = drvA.name.split(' ').pop().toLowerCase();
+        const portraitB = drvB.name.split(' ').pop().toLowerCase();
+
+        driverAImg.src = `/assets/legacy/drivers/portrait_${portraitA}.png`;
+        driverBImg.src = `/assets/legacy/drivers/portrait_${portraitB}.png`;
+
+        driverAContainer.style.borderBottom = `4px solid ${colorA}`;
+        driverBContainer.style.borderBottom = `4px solid ${colorB}`;
+        driverAContainer.style.boxShadow = `0 10px 20px ${colorA}33`;
+        driverBContainer.style.boxShadow = `0 10px 20px ${colorB}33`;
 
         // Render Animated Bars
         const metrics = [
@@ -65,15 +99,27 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
           <div style="display: flex; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden;">
              <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 2px;">
-                <div style="width: ${pctA}%; background: ${colorA}; transition: width 0.8s easeOutQuart; border-radius: 4px 0 0 4px;"></div>
+                <div class="compare-bar-fill" data-width="${pctA}%" style="width: 0%; background: ${colorA}; border-radius: 4px 0 0 4px;"></div>
              </div>
              <div style="width: 50%; display: flex; justify-content: flex-start; padding-left: 2px;">
-                <div style="width: ${pctB}%; background: ${colorB}; transition: width 0.8s easeOutQuart; border-radius: 0 4px 4px 0;"></div>
+                <div class="compare-bar-fill" data-width="${pctB}%" style="width: 0%; background: ${colorB}; border-radius: 0 4px 4px 0;"></div>
              </div>
           </div>
         </div>
       `;
         }).join('');
+
+        // Apply motion.dev animate with spring physics
+        setTimeout(() => {
+            document.querySelectorAll('.compare-bar-fill').forEach(bar => {
+                animate(bar, { width: bar.dataset.width }, {
+                    type: "spring",
+                    stiffness: 80,
+                    damping: 15,
+                    mass: 1.2
+                });
+            });
+        }, 50);
 
         // Update Radar Chart
         const radarData = {
@@ -126,15 +172,78 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Save to Firestore (Fire-and-forget, non-blocking)
-        if (f1Auth && f1Auth.currentUser) {
-            f1SetDoc(f1Doc('users', f1Auth.currentUser.uid + '/history/lastCompare'), {
-                driverA: valA,
-                driverB: valB,
-                timestamp: new Date().toISOString()
-            }, { merge: true }).catch(() => { }); // silent fail offline
+        // Handle save status reset
+        if (saveBtn) {
+            saveBtn.textContent = '⭐ Save Comparison';
+            saveBtn.classList.remove('btn-success');
         }
     };
+
+    function updateSaveButtonStatus() {
+        if (!saveBtn || !saveTooltip) return;
+        if (currentAuthUser) {
+            saveBtn.disabled = false;
+            saveBtn.style.opacity = '1';
+            saveTooltip.style.display = 'none';
+        } else {
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.5';
+            saveTooltip.style.display = 'block';
+            saveTooltip.textContent = "Log in to save comparison";
+        }
+    }
+
+    if (swapBtn) {
+        swapBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Micro-animation: Pulse
+            swapBtn.classList.remove('animate__animated', 'animate__pulse');
+            void swapBtn.offsetWidth; // trigger reflow
+            swapBtn.classList.add('animate__animated', 'animate__pulse');
+
+            const temp = driverASelect.value;
+            driverASelect.value = driverBSelect.value;
+            driverBSelect.value = temp;
+            renderComparison();
+        });
+    }
+
+    if (saveBtn) {
+        saveBtn.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (!currentAuthUser) return;
+
+            const valA = driverASelect.value;
+            const valB = driverBSelect.value;
+            const compareId = `${valA}_vs_${valB}_${Date.now()}`;
+
+            saveBtn.textContent = 'Saving...';
+            saveBtn.disabled = true;
+            saveBtn.classList.remove('animate__animated', 'animate__rubberBand', 'animate__headShake');
+
+            try {
+                await f1SetDoc(f1Doc('users', currentAuthUser.uid, 'comparisons', compareId), {
+                    driver1: valA,
+                    driver2: valB,
+                    timestamp: new Date().toISOString()
+                }, { merge: true });
+
+                saveBtn.textContent = '✅ Saved';
+                saveBtn.classList.add('btn-success', 'animate__animated', 'animate__rubberBand');
+            } catch (err) {
+                console.error("Failed to save comparison", err);
+                saveBtn.textContent = '❌ Error';
+                saveBtn.classList.add('animate__animated', 'animate__headShake');
+            } finally {
+                setTimeout(() => {
+                    if (saveBtn.textContent === '✅ Saved' || saveBtn.textContent === '❌ Error') {
+                        saveBtn.disabled = false;
+                    }
+                }, 2000);
+            }
+        });
+    }
 
     function generateMockRatings(drv) {
         // Generate deterministic mock ratings out of 100 based on driver pts

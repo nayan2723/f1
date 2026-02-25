@@ -12,40 +12,7 @@
 <body class="theme-dark">
   <div class="fixed-background"></div>
 
-  <!-- AUTH MODAL -->
-  <div id="auth-modal" class="modal-overlay hidden">
-    <div class="auth-card glass-card">
-      <div class="auth-header">
-        <h2>Driver Access</h2>
-        <button id="auth-close" class="modal-close">&times;</button>
-      </div>
-      <div class="auth-body">
-        <div id="auth-error" class="auth-error hidden"></div>
-        <form id="auth-form">
-          <div class="form-group">
-            <label>Email</label>
-            <input type="email" id="auth-email" required placeholder="name@f1insight.com" />
-          </div>
-          <div class="form-group">
-            <label>Password</label>
-            <input type="password" id="auth-password" required placeholder="••••••••" />
-          </div>
-          <button type="submit" class="btn-primary w-100" id="auth-submit-btn">
-            <span class="btn-text">Sign In</span>
-          </button>
-        </form>
-        <div class="auth-divider"><span>OR</span></div>
-        <button id="auth-google-btn" class="btn-secondary w-100">
-          <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="btn-icon">
-          Sign In with Google
-        </button>
-      </div>
-      <div class="auth-footer">
-        <p>Don't have an account? <a href="#" id="auth-toggle-mode">Sign Up</a></p>
-      </div>
-    </div>
-  </div>
-
+  <!-- AUTH MODAL MOVED TO REACT -->
   <!-- TEAM SELECTION MODAL -->
   <div id="team-modal" class="modal-overlay hidden">
     <div class="auth-card glass-card" style="max-width: 500px;">
@@ -73,21 +40,59 @@
 
     <!-- Comparison Controls -->
     <div class="compare-controls glass-card"
-      style="display: flex; align-items: center; justify-content: center; gap: 24px; padding: 24px; margin-bottom: 32px;">
-      <select id="driver-a-select" class="f1-select"></select>
-      <div class="vs-badge" style="font-family: 'Orbitron'; color: var(--f1-red); font-size: 24px; font-weight: 700;">VS
+      style="display: flex; align-items: center; justify-content: center; gap: 40px; padding: 24px; margin-bottom: 32px; position: relative;">
+
+      <!-- Driver A Column -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <div id="driver-a-headshot" class="driver-headshot-container">
+          <img src="" alt="Driver A" class="driver-headshot"
+            onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'rgba(255,255,255,0.05)\'/><text x=\'50\' y=\'55\' font-family=\'Orbitron\' font-size=\'32\' fill=\'rgba(255,255,255,0.2)\' text-anchor=\'middle\' alignment-baseline=\'middle\'>?</text></svg>'" />
+        </div>
+        <div id="radix-driver-a"></div>
+        <select id="driver-a-select" class="hidden"></select>
       </div>
-      <select id="driver-b-select" class="f1-select"></select>
+
+      <!-- Center Controls -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+        <div class="vs-badge" style="font-family: 'Orbitron'; color: var(--f1-red); font-size: 24px; font-weight: 700;">
+          VS</div>
+        <button id="swap-drivers-btn" class="btn-secondary"
+          style="border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 16px;"
+          title="Swap Drivers">⇄</button>
+      </div>
+
+      <!-- Driver B Column -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <div id="driver-b-headshot" class="driver-headshot-container">
+          <img src="" alt="Driver B" class="driver-headshot"
+            onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'rgba(255,255,255,0.05)\'/><text x=\'50\' y=\'55\' font-family=\'Orbitron\' font-size=\'32\' fill=\'rgba(255,255,255,0.2)\' text-anchor=\'middle\' alignment-baseline=\'middle\'>?</text></svg>'" />
+        </div>
+        <div id="radix-driver-b"></div>
+        <select id="driver-b-select" class="hidden"></select>
+      </div>
+
     </div>
 
     <!-- Comparison Layout -->
     <div class="content-grid" style="grid-template-columns: 1fr 1fr; gap: 32px;">
 
       <!-- Stats Bars -->
-      <div class="compare-stats glass-card" style="padding: 24px;">
-        <h3 style="margin-top: 0; font-family: 'Orbitron'; font-size: 16px;">Metrics Head-to-Head</h3>
-        <div id="compare-bars-container" style="margin-top: 24px; display: flex; flex-direction: column; gap: 20px;">
-          <!-- JS Injected Bars -->
+      <div class="compare-stats glass-card"
+        style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h3 style="margin: 0; font-family: 'Orbitron'; font-size: 16px;">Metrics Head-to-Head</h3>
+
+            <div class="tooltip-container" id="save-compare-container">
+              <button id="save-compare-btn" class="btn-primary btn-sm" disabled style="opacity: 0.5;">
+                ⭐ Save Comparison
+              </button>
+              <span class="tooltip-text" id="save-compare-tooltip">Log in to save comparison</span>
+            </div>
+          </div>
+          <div id="compare-bars-container" style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- JS Injected Bars -->
+          </div>
         </div>
       </div>
 
@@ -104,6 +109,10 @@
   <script src="f1data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script type="module" src="auth.js"></script>
+
+  <!-- Vite Entry for React Islands -->
+  <script type="module" src="lib/components/mountReact.jsx"></script>
+
   <script type="module" src="compare.js"></script>
   <script>
     // ── Render nav & footer ──
