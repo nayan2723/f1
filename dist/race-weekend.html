@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 Insight – 2026 Season Dashboard</title>
+  <meta name="description" content="F1 Insight 2026 Season – The ultimate Formula 1 analytics intelligence platform">
+  <script type="module" crossorigin src="/assets/race-weekend-BxTlah_c.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/vendor-B_9GMGaQ.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-react-Cke1li9a.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-radix-YAVAkKLi.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-motion-CsAKAQ8w.js">
+  <link rel="modulepreload" crossorigin href="/assets/mountReact-Do6zrrNa.js">
+  <link rel="stylesheet" crossorigin href="/assets/vendor-BU6TPP52.css">
+  <link rel="stylesheet" crossorigin href="/assets/mountReact-DDVBb84C.css">
+  <link rel="stylesheet" crossorigin href="/assets/styles-Yw2xTk-D.css">
+</head>
+
+<body class="theme-dark">
+  <div class="fixed-background"></div>
+
+  <!-- AUTH MODAL MOVED TO REACT -->
+  <!-- TEAM SELECTION MODAL -->
+  <div id="team-modal" class="modal-overlay hidden">
+    <div class="auth-card glass-card" style="max-width: 500px;">
+      <div class="auth-header">
+        <h2>Select Favorite Team</h2>
+        <button id="team-close" class="modal-close">&times;</button>
+      </div>
+      <div class="auth-body">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; text-align: center;">Personalize
+          your F1 Insight experience.</p>
+        <div class="team-grid-select" id="team-selector-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="navbar-root"></div>
+
+  <main class="main-content" style="max-width: 1200px; margin: 0 auto; padding: 40px 20px;">
+    <header class="section-header" style="text-align: center; margin-bottom: 40px;">
+      <h1 class="page-title text-gradient-animate">Live Timing</h1>
+      <p class="section-subtitle" id="live-session-status">Session: RACE | Laps: 12/58 | Track: DRY</p>
+    </header>
+
+    <div class="content-grid" style="grid-template-columns: 280px 1fr; gap: 32px; align-items: start;">
+
+      <!-- Session Controls -->
+      <div class="live-controls glass-card" style="padding: 24px; position: sticky; top: 100px;">
+        <h3 style="font-family: 'Orbitron', sans-serif; font-size: 14px; margin-top: 0; color: var(--text-primary);">
+          Session Control</h3>
+        <select id="session-select" class="f1-select" style="width: 100%; margin-top: 12px; margin-bottom: 24px;">
+          <option value="practice">Free Practice</option>
+          <option value="quali">Qualifying</option>
+          <option value="race" selected>Race (Live)</option>
+        </select>
+        <button id="btn-toggle-live" class="btn-primary w-100" style="justify-content: center; margin-bottom: 12px;">
+          <span class="btn-text">Pause Feed</span>
+        </button>
+        <div style="font-size: 11px; color: var(--text-tertiary); text-align: center;">
+          Data refresh every 3000ms
+        </div>
+      </div>
+
+      <!-- Live Leaderboard -->
+      <div class="live-leaderboard glass-card" style="padding: 0; overflow: hidden; transform: none;">
+        <table class="data-table" id="live-timing-table" style="width: 100%; margin: 0;">
+          <thead>
+            <tr>
+              <th style="width: 50px;">POS</th>
+              <th style="width: 50px;">CHG</th>
+              <th>DRIVER</th>
+              <th style="width: 60px;">TYRE</th>
+              <th style="width: 120px; text-align: right;">INTERVAL</th>
+              <th style="width: 120px; text-align: right;">LEADER</th>
+            </tr>
+          </thead>
+          <tbody id="live-timing-body">
+            <!-- JS Injected rows -->
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="f1data.js"></script>
+  <script>
+    // ── Render nav & footer ──
+    document.getElementById('navbar-root').innerHTML = renderNavbar('race-weekend.html');
+    document.getElementById('footer-root').innerHTML = renderFooter();
+  </script>
+</body>
+
+</html>

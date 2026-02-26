@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>F1 Insight – 2026 Season Dashboard</title>
+  <meta name="description" content="F1 Insight 2026 Season – The ultimate Formula 1 analytics intelligence platform">
+  <script type="module" crossorigin src="/assets/compare-DHuQEplZ.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/vendor-B_9GMGaQ.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-react-Cke1li9a.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-radix-YAVAkKLi.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-motion-CsAKAQ8w.js">
+  <link rel="modulepreload" crossorigin href="/assets/mountReact-Do6zrrNa.js">
+  <link rel="stylesheet" crossorigin href="/assets/vendor-BU6TPP52.css">
+  <link rel="stylesheet" crossorigin href="/assets/mountReact-DDVBb84C.css">
+  <link rel="stylesheet" crossorigin href="/assets/styles-Yw2xTk-D.css">
+</head>
+
+<body class="theme-dark">
+  <div class="fixed-background"></div>
+
+  <!-- AUTH MODAL MOVED TO REACT -->
+  <!-- TEAM SELECTION MODAL -->
+  <div id="team-modal" class="modal-overlay hidden">
+    <div class="auth-card glass-card" style="max-width: 500px;">
+      <div class="auth-header">
+        <h2>Select Favorite Team</h2>
+        <button id="team-close" class="modal-close">&times;</button>
+      </div>
+      <div class="auth-body">
+        <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; text-align: center;">Personalize
+          your F1 Insight experience.</p>
+        <div class="team-grid-select" id="team-selector-grid">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="navbar-root"></div>
+
+  <main class="main-content">
+    <header class="section-header" style="text-align: center; margin-bottom: 40px;">
+      <h1 class="page-title text-gradient-animate">Driver Comparison</h1>
+      <p class="section-subtitle">Head-to-head intelligence across the 2026 Grid</p>
+    </header>
+
+    <!-- Comparison Controls -->
+    <div class="compare-controls glass-card"
+      style="display: flex; align-items: center; justify-content: center; gap: 40px; padding: 24px; margin-bottom: 32px; position: relative;">
+
+      <!-- Driver A Column -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <div id="driver-a-headshot" class="driver-headshot-container">
+          <img src="" alt="Driver A" class="driver-headshot"
+            onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'rgba(255,255,255,0.05)\'/><text x=\'50\' y=\'55\' font-family=\'Orbitron\' font-size=\'32\' fill=\'rgba(255,255,255,0.2)\' text-anchor=\'middle\' alignment-baseline=\'middle\'>?</text></svg>'" />
+        </div>
+        <div id="radix-driver-a"></div>
+        <select id="driver-a-select" class="hidden"></select>
+      </div>
+
+      <!-- Center Controls -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+        <div class="vs-badge" style="font-family: 'Orbitron'; color: var(--f1-red); font-size: 24px; font-weight: 700;">
+          VS</div>
+        <button id="swap-drivers-btn" class="btn-secondary"
+          style="border-radius: 50%; width: 40px; height: 40px; padding: 0; display: flex; align-items: center; justify-content: center; font-size: 16px;"
+          title="Swap Drivers">⇄</button>
+      </div>
+
+      <!-- Driver B Column -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 16px;">
+        <div id="driver-b-headshot" class="driver-headshot-container">
+          <img src="" alt="Driver B" class="driver-headshot"
+            onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'><rect width=\'100\' height=\'100\' fill=\'rgba(255,255,255,0.05)\'/><text x=\'50\' y=\'55\' font-family=\'Orbitron\' font-size=\'32\' fill=\'rgba(255,255,255,0.2)\' text-anchor=\'middle\' alignment-baseline=\'middle\'>?</text></svg>'" />
+        </div>
+        <div id="radix-driver-b"></div>
+        <select id="driver-b-select" class="hidden"></select>
+      </div>
+
+    </div>
+
+    <!-- Comparison Layout -->
+    <div class="content-grid" style="grid-template-columns: 1fr 1fr; gap: 32px;">
+
+      <!-- Stats Bars -->
+      <div class="compare-stats glass-card"
+        style="padding: 24px; display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h3 style="margin: 0; font-family: 'Orbitron'; font-size: 16px;">Metrics Head-to-Head</h3>
+
+            <div class="tooltip-container" id="save-compare-container">
+              <button id="save-compare-btn" class="btn-primary btn-sm" disabled style="opacity: 0.5;">
+                ⭐ Save Comparison
+              </button>
+              <span class="tooltip-text" id="save-compare-tooltip">Log in to save comparison</span>
+            </div>
+          </div>
+          <div id="compare-bars-container" style="display: flex; flex-direction: column; gap: 20px;">
+            <!-- JS Injected Bars -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Radar Chart -->
+      <div class="compare-radar glass-card" style="padding: 24px;">
+        <canvas id="compareRadarChart"></canvas>
+      </div>
+
+    </div>
+  </main>
+
+  <div id="footer-root"></div>
+
+  <script src="f1data.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Vite Entry for React Islands -->
+
+  <script>
+    // ── Render nav & footer ──
+    document.getElementById('navbar-root').innerHTML = renderNavbar('compare.html');
+    document.getElementById('footer-root').innerHTML = renderFooter();
+
+    // ── Init Animations ──
+    animateOnScroll();
+  </script>
+</body>
+
+</html>

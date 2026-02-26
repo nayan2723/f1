@@ -205,6 +205,23 @@
 
     // ── Init Animations ──
     animateOnScroll();
+
+    // ── Motion.dev Scroll Parallax ──
+    import('https://esm.sh/motion@11.16.1').then(({ scroll, animate }) => {
+      const header = document.querySelector('.page-header');
+      if (header) {
+        scroll(
+          animate(header, {
+            y: [0, 150],
+            opacity: [1, 0]
+          }),
+          {
+            target: header,
+            offset: ["start start", "end center"]
+          }
+        );
+      }
+    }).catch(err => console.error("Motion.dev failed to load", err));
   </script>
 
   <script type="module" src="/lib/components/mountReact.jsx"></script>

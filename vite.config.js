@@ -18,6 +18,28 @@ export default defineConfig({
                 "race-weekend": resolve(__dirname, 'site/public/race-weekend.html'),
                 predictions: resolve(__dirname, 'site/public/predictions.html'),
                 legacy: resolve(__dirname, 'site/public/legacy.html')
+            },
+            output: {
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        if (id.includes('primereact')) {
+                            return 'vendor-primereact';
+                        }
+                        if (id.includes('framer-motion') || id.includes('motion')) {
+                            return 'vendor-motion';
+                        }
+                        if (id.includes('@radix-ui')) {
+                            return 'vendor-radix';
+                        }
+                        if (id.includes('react') || id.includes('react-dom')) {
+                            return 'vendor-react';
+                        }
+                        if (id.includes('lucide-react')) {
+                            return 'vendor-lucide';
+                        }
+                        return 'vendor'; // Fallback for other node_modules
+                    }
+                }
             }
         }
     }
