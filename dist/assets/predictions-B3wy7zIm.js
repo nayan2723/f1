@@ -1,4 +1,4 @@
-import"./f1data-CYHUHGUy.js";document.getElementById("navbar-root").innerHTML=renderNavbar("predictions.html");document.getElementById("footer-root").innerHTML=renderFooter();const n=[...F1Data.drivers].sort((t,i)=>i.winProb-t.winProb);document.getElementById("win-prob-list").innerHTML=n.map((t,i)=>{const e=F1Data.getTeamColor(t.team);return`
+import"./f1data-Bkmt7dHv.js";document.getElementById("navbar-root").innerHTML=renderNavbar("predictions.html");document.getElementById("footer-root").innerHTML=renderFooter();const n=[...F1Data.drivers].sort((t,i)=>i.winProb-t.winProb);document.getElementById("win-prob-list").innerHTML=n.map((t,i)=>{const e=F1Data.getTeamColor(t.team);return`
       <div class="prediction-item">
         <span class="prediction-rank">${i+1}</span>
         <span class="prediction-driver">

@@ -1,4 +1,4 @@
-import"./f1data-CYHUHGUy.js";document.getElementById("navbar-root").innerHTML=renderNavbar("circuits.html");document.getElementById("footer-root").innerHTML=renderFooter();function e(t){const i=t==="all"?F1Data.circuits:F1Data.circuits.filter(a=>a.type===t);document.getElementById("circuit-grid").innerHTML=i.map((a,c)=>`
+import"./f1data-Bkmt7dHv.js";document.getElementById("navbar-root").innerHTML=renderNavbar("circuits.html");document.getElementById("footer-root").innerHTML=renderFooter();function e(t){const i=t==="all"?F1Data.circuits:F1Data.circuits.filter(a=>a.type===t);document.getElementById("circuit-grid").innerHTML=i.map((a,c)=>`
         <div class="circuit-card animate-in" style="animation-delay:${c*.05}s" data-type="${a.type}">
           <div class="circuit-card-header">
             <div>

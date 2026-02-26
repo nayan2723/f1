@@ -1,4 +1,4 @@
-import"./f1data-CYHUHGUy.js";document.getElementById("navbar-root").innerHTML=renderNavbar("legacy.html");document.getElementById("footer-root").innerHTML=renderFooter();function t(i){return`<span class="legacy-tag">${i}</span>`}document.getElementById("timeline-root").innerHTML=F1Data.legacy.timeline.map((i,a)=>`
+import"./f1data-Bkmt7dHv.js";document.getElementById("navbar-root").innerHTML=renderNavbar("legacy.html");document.getElementById("footer-root").innerHTML=renderFooter();function t(i){return`<span class="legacy-tag">${i}</span>`}document.getElementById("timeline-root").innerHTML=F1Data.legacy.timeline.map((i,a)=>`
       <div class="timeline-item animate-in" style="animation-delay:${a*.1}s">
         <div class="timeline-dot"></div>
         <div class="timeline-content">
