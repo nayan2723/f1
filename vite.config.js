@@ -6,6 +6,8 @@ export default defineConfig({
     build: {
         outDir: '../../dist',
         emptyOutDir: true,
+        sourcemap: false, // Phase 8: Hardening - disable sourcemaps
+        minify: 'esbuild',
         rollupOptions: {
             input: {
                 main: resolve(__dirname, 'site/public/index.html'),
@@ -42,5 +44,9 @@ export default defineConfig({
                 }
             }
         }
+    },
+    esbuild: {
+        // Phase 8: Hardening - drop console logs and debuggers from production
+        drop: ['console', 'debugger'],
     }
 });

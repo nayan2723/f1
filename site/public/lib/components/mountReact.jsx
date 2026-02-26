@@ -1,7 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import { DriverSelect } from './DriverSelect.jsx';
-import { AuthDialog } from './AuthDialog.jsx';
 import './islands.css';
 
 // Wait for F1Data and DOM to be ready
@@ -34,22 +33,21 @@ document.addEventListener('DOMContentLoaded', () => {
         );
     }
 
-    // Mount Auth Dialog globally
-    let authContainer = document.getElementById('auth-react-root');
-    if (!authContainer) {
-        authContainer = document.createElement('div');
-        authContainer.id = 'auth-react-root';
-        document.body.appendChild(authContainer);
-    }
-    const rootAuth = createRoot(authContainer);
-    rootAuth.render(<AuthDialog />);
-
     // Mount PrimeReact DataTable conditionally
     const standingsContainer = document.getElementById('full-standings-react-root');
     if (standingsContainer) {
         import('./DriverStandingsTable.jsx').then(({ DriverStandingsTable }) => {
             const rootStandings = createRoot(standingsContainer);
             rootStandings.render(<DriverStandingsTable />);
+        });
+    }
+
+    // Mount Personality Engine conditionally
+    const quizContainer = document.getElementById('personality-quiz-root');
+    if (quizContainer) {
+        import('./PersonalityEntryPoint.jsx').then(({ PersonalityEntryPoint }) => {
+            const rootQuiz = createRoot(quizContainer);
+            rootQuiz.render(<PersonalityEntryPoint />);
         });
     }
 });

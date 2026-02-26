@@ -21,8 +21,8 @@
     <div class="team-grid" id="team-grid"></div>
   </main>
   <div id="footer-root"></div>
-  <script src="f1data.js"></script>
-  <script>
+  <script type="module" src="f1data.js"></script>
+  <script type="module">
     document.getElementById('navbar-root').innerHTML = renderNavbar('teams.html');
     document.getElementById('footer-root').innerHTML = renderFooter();
 

@@ -1,5 +1,6 @@
-import { f1Auth, f1Db, f1Doc, f1SetDoc } from './lib/firebase.js';
+
 import { animate } from 'motion';
+import { escapeHTML } from './lib/sanitize.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     const driverASelect = document.getElementById('driver-a-select');
@@ -11,15 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const drivers = window.F1Data.drivers;
     let radarChart = null;
-    let currentAuthUser = null;
 
-    // Phase 6: Sync Auth State reliably
-    import('./lib/authService.js').then(module => {
-        module.authService.initAuthListener(user => {
-            currentAuthUser = user;
-            updateSaveButtonStatus();
-        });
-    });
 
     const driverAImg = document.querySelector('#driver-a-headshot img');
     const driverBImg = document.querySelector('#driver-b-headshot img');
@@ -29,8 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const saveBtn = document.getElementById('save-compare-btn');
     const saveTooltip = document.getElementById('save-compare-tooltip');
 
-    // Initialize Selects
-    const optionsHTML = drivers.map(d => `<option value="${d.code.toLowerCase()}">${d.name} (${d.team})</option>`).join('');
+    // Initialize Selects (Sanitized)
+    const optionsHTML = drivers.map(d => `<option value="${escapeHTML(d.code.toLowerCase())}">${escapeHTML(d.name)} (${escapeHTML(d.team)})</option>`).join('');
     driverASelect.innerHTML = optionsHTML;
     driverBSelect.innerHTML = optionsHTML;
 
@@ -93,9 +86,9 @@ document.addEventListener('DOMContentLoaded', () => {
             return `
         <div class="compare-metric">
           <div style="display:flex; justify-content: space-between; font-size: 11px; color: var(--text-secondary); margin-bottom: 6px; text-transform: uppercase;">
-             <span style="color: ${aWin ? '#fff' : ''}">${drvA.code} • ${aVal}</span>
-             <span>${m.label}</span>
-             <span style="color: ${bWin ? '#fff' : ''}">${bVal} • ${drvB.code}</span>
+             <span style="color: ${aWin ? '#fff' : ''}">${escapeHTML(drvA.code)} • ${escapeHTML(aVal)}</span>
+             <span>${escapeHTML(m.label)}</span>
+             <span style="color: ${bWin ? '#fff' : ''}">${escapeHTML(bVal)} • ${escapeHTML(drvB.code)}</span>
           </div>
           <div style="display: flex; height: 8px; background: rgba(255,255,255,0.05); border-radius: 4px; overflow: hidden;">
              <div style="width: 50%; display: flex; justify-content: flex-end; padding-right: 2px;">
@@ -179,18 +172,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    function updateSaveButtonStatus() {
-        if (!saveBtn || !saveTooltip) return;
-        if (currentAuthUser) {
-            saveBtn.disabled = false;
-            saveBtn.style.opacity = '1';
-            saveTooltip.style.display = 'none';
-        } else {
-            saveBtn.disabled = true;
-            saveBtn.style.opacity = '0.5';
-            saveTooltip.style.display = 'block';
-            saveTooltip.textContent = "Log in to save comparison";
-        }
+    if (saveBtn) {
+        saveBtn.disabled = false;
+        saveBtn.style.opacity = '1';
+        if (saveTooltip) saveTooltip.style.display = 'none';
     }
 
     if (swapBtn) {
@@ -212,7 +197,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (saveBtn) {
         saveBtn.addEventListener('click', async (e) => {
             e.preventDefault();
-            if (!currentAuthUser) return;
+
+            // Rate Limiting & Abuse Mitigation
+            const now = Date.now();
+            const lastSave = sessionStorage.getItem('f1_last_save_time');
+            if (lastSave && (now - parseInt(lastSave, 10) < 5000)) {
+                saveBtn.textContent = 'Too Fast';
+                saveBtn.classList.add('animate__animated', 'animate__headShake');
+                setTimeout(() => {
+                    saveBtn.textContent = '⭐ Save Comparison';
+                    saveBtn.classList.remove('animate__animated', 'animate__headShake');
+                }, 2000);
+                return;
+            }
+            sessionStorage.setItem('f1_last_save_time', now.toString());
 
             const valA = driverASelect.value;
             const valB = driverBSelect.value;
@@ -223,22 +221,28 @@ document.addEventListener('DOMContentLoaded', () => {
             saveBtn.classList.remove('animate__animated', 'animate__rubberBand', 'animate__headShake');
 
             try {
-                await f1SetDoc(f1Doc('users', currentAuthUser.uid, 'comparisons', compareId), {
+                // Save locally
+                const savedComparisons = JSON.parse(localStorage.getItem('f1_comparisons') || '[]');
+                savedComparisons.push({
+                    id: compareId,
                     driver1: valA,
                     driver2: valB,
                     timestamp: new Date().toISOString()
-                }, { merge: true });
+                });
+                localStorage.setItem('f1_comparisons', JSON.stringify(savedComparisons));
 
                 saveBtn.textContent = '✅ Saved';
                 saveBtn.classList.add('btn-success', 'animate__animated', 'animate__rubberBand');
             } catch (err) {
-                console.error("Failed to save comparison", err);
+                console.error("Failed to save comparison locally", err);
                 saveBtn.textContent = '❌ Error';
                 saveBtn.classList.add('animate__animated', 'animate__headShake');
             } finally {
                 setTimeout(() => {
                     if (saveBtn.textContent === '✅ Saved' || saveBtn.textContent === '❌ Error') {
                         saveBtn.disabled = false;
+                        saveBtn.textContent = '⭐ Save Comparison'; // Reset UI state after cooldown
+                        saveBtn.classList.remove('btn-success', 'animate__animated', 'animate__rubberBand', 'animate__headShake');
                     }
                 }, 2000);
             }

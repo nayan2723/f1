@@ -12,16 +12,17 @@
 <body class="theme-dark">
   <div class="fixed-background"></div>
 
-  <!-- AUTH MODAL MOVED TO REACT -->
+
 
   <!-- TEAM SELECTION MODAL -->
   <div id="team-modal" class="modal-overlay hidden">
-    <div class="auth-card glass-card" style="max-width: 500px;">
-      <div class="auth-header">
+    <div class="glass-card" style="max-width: 500px; padding: 32px;">
+      <div class="modal-header-container"
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <h2>Select Favorite Team</h2>
         <button id="team-close" class="modal-close">&times;</button>
       </div>
-      <div class="auth-body">
+      <div class="modal-body-content">
         <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; text-align: center;">Personalize
           your F1 Insight experience.</p>
         <div class="team-grid-select" id="team-selector-grid">
@@ -36,7 +37,8 @@
   <main class="main-content">
     <header class="page-header animate-in">
       <h1 class="page-title text-gradient-animate">2026 SEASON DASHBOARD</h1>
-      <p class="page-subtitle">Real-time championship intelligence across all 22 drivers and 11 constructors</p>
+      <p class="page-subtitle">Unprecedented telemetric and strategic intelligence for the 2026 Formula 1 World
+        Championship.</p>
     </header>
 
     <!-- STAT CARDS -->
@@ -76,7 +78,8 @@
             <div class="countdown-item"><span class="countdown-value cd-secs">--</span><span
                 class="countdown-label">Secs</span></div>
           </div>
-          <a href="circuits.html" class="btn-primary" style="width:100%;justify-content:center">View Circuit →</a>
+          <a href="circuits.html" class="btn-primary" style="width:100%;justify-content:center">Analyze Circuit Data
+            →</a>
         </div>
         <!-- Mini Standings -->
         <div class="glass-card animate-in animate-delay-3">
@@ -85,7 +88,8 @@
             <table class="data-table" id="mini-standings"></table>
           </div>
           <div style="text-align:center;margin-top:16px">
-            <a href="drivers.html" class="btn-primary" style="font-size:12px;padding:8px 20px">View Full Standings →</a>
+            <a href="drivers.html" class="btn-primary" style="font-size:12px;padding:8px 20px">Explore Grid Analytics
+              →</a>
           </div>
         </div>
       </div>
@@ -100,10 +104,10 @@
 
   <div id="footer-root"></div>
 
-  <script src="f1data.js"></script>
+  <script type="module" src="f1data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="auth.js"></script>
-  <script>
+
+  <script type="module">
     // ── Render nav & footer ──
     document.getElementById('navbar-root').innerHTML = renderNavbar('index.html');
     document.getElementById('footer-root').innerHTML = renderFooter();
@@ -225,7 +229,7 @@
   </script>
 
   <script type="module" src="/lib/components/mountReact.jsx"></script>
-  <script type="module" src="auth.js"></script>
+
 </body>
 
 </html>

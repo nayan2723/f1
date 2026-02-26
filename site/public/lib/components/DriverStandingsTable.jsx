@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 
@@ -23,15 +24,15 @@ export function DriverStandingsTable() {
     }, []);
 
     const posTemplate = (rowData) => {
-        return <span className="pos-cell">{rowData.pos}</span>;
+        return <span className={`pos-cell font-mono text-xs ${rowData.pos <= 3 ? 'text-white font-bold' : 'text-white/40'}`}>{rowData.pos}</span>;
     };
 
     const driverTemplate = (rowData) => {
         const tc = window.F1Data.getTeamColor(rowData.team);
         return (
             <div className="driver-cell flex items-center gap-3">
-                <span className="team-color-bar" style={{ background: tc, width: '4px', height: '24px', display: 'inline-block', borderRadius: '2px' }}></span>
-                <span className="driver-name font-bold text-white">{rowData.name}</span>
+                <span className="team-color-bar shadow-sm" style={{ background: tc, width: '4px', height: '24px', display: 'inline-block', borderRadius: '2px', boxShadow: `0 0 10px ${tc}80` }}></span>
+                <span className="driver-name font-black text-white text-base tracking-tight">{rowData.name}</span>
                 <span className="driver-code text-white/50 text-xs tracking-wider md:inline hidden">{rowData.code}</span>
             </div>
         );
@@ -42,7 +43,19 @@ export function DriverStandingsTable() {
     };
 
     const pointsTemplate = (rowData) => {
-        return <span className="points-cell font-orbitron font-bold text-white">{rowData.pts}</span>;
+        if (rowData.pts === 0) {
+            return <span className="points-cell font-orbitron font-bold text-white/30">{rowData.pts}</span>;
+        }
+        return (
+            <motion.span
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: rowData.pos * 0.05, type: 'spring', stiffness: 200, damping: 20 }}
+                className="points-cell font-orbitron font-bold text-white"
+            >
+                {rowData.pts}
+            </motion.span>
+        );
     };
 
     return (
@@ -51,7 +64,8 @@ export function DriverStandingsTable() {
                 paginator rows={10} rowsPerPageOptions={[10, 22]}
                 stripedRows
                 emptyMessage="Loading driver standings..."
-                className="w-full text-sm">
+                className="w-full text-sm"
+                rowClassName={(rowData) => rowData.pos <= 3 ? 'top-3-row' : ''}>
                 <Column field="pos" header="POS" body={posTemplate} sortable className="w-[80px] px-4 py-3 border-b border-white/5" headerClassName="text-white/50 font-bold tracking-wider text-xs px-4 py-3 border-b border-white/10 uppercase" />
                 <Column field="name" header="DRIVER" body={driverTemplate} sortable className="px-4 py-3 border-b border-white/5" headerClassName="text-white/50 font-bold tracking-wider text-xs px-4 py-3 border-b border-white/10 uppercase" />
                 <Column field="team" header="TEAM" body={teamTemplate} sortable className="px-4 py-3 border-b border-white/5 hidden sm:table-cell" headerClassName="text-white/50 font-bold tracking-wider text-xs px-4 py-3 border-b border-white/10 uppercase hidden sm:table-cell" />

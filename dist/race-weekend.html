@@ -6,29 +6,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>F1 Insight – 2026 Season Dashboard</title>
   <meta name="description" content="F1 Insight 2026 Season – The ultimate Formula 1 analytics intelligence platform">
-  <script type="module" crossorigin src="/assets/race-weekend-BxTlah_c.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/vendor-B_9GMGaQ.js">
-  <link rel="modulepreload" crossorigin href="/assets/vendor-react-Cke1li9a.js">
-  <link rel="modulepreload" crossorigin href="/assets/vendor-radix-YAVAkKLi.js">
-  <link rel="modulepreload" crossorigin href="/assets/vendor-motion-CsAKAQ8w.js">
-  <link rel="modulepreload" crossorigin href="/assets/mountReact-Do6zrrNa.js">
+  <script type="module" crossorigin src="/assets/race-weekend-ITXUymtL.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/f1data-CYHUHGUy.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-DXLWAiYI.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-react-C2FUrQ2K.js">
+  <link rel="modulepreload" crossorigin href="/assets/vendor-radix-206XVAFP.js">
+  <link rel="modulepreload" crossorigin href="/assets/mountReact-Bcx_AE3E.js">
+  <link rel="stylesheet" crossorigin href="/assets/f1data-B_jtZwbz.css">
   <link rel="stylesheet" crossorigin href="/assets/vendor-BU6TPP52.css">
-  <link rel="stylesheet" crossorigin href="/assets/mountReact-DDVBb84C.css">
-  <link rel="stylesheet" crossorigin href="/assets/styles-Yw2xTk-D.css">
+  <link rel="stylesheet" crossorigin href="/assets/mountReact-D-zGj_Pg.css">
 </head>
 
 <body class="theme-dark">
   <div class="fixed-background"></div>
 
-  <!-- AUTH MODAL MOVED TO REACT -->
+
   <!-- TEAM SELECTION MODAL -->
   <div id="team-modal" class="modal-overlay hidden">
-    <div class="auth-card glass-card" style="max-width: 500px;">
-      <div class="auth-header">
+    <div class="glass-card" style="max-width: 500px; padding: 32px;">
+      <div class="modal-header-container"
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <h2>Select Favorite Team</h2>
         <button id="team-close" class="modal-close">&times;</button>
       </div>
-      <div class="auth-body">
+      <div class="modal-body-content">
         <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; text-align: center;">Personalize
           your F1 Insight experience.</p>
         <div class="team-grid-select" id="team-selector-grid">
@@ -88,13 +89,8 @@
   </main>
 
   <div id="footer-root"></div>
-
-  <script src="f1data.js"></script>
-  <script>
-    // ── Render nav & footer ──
-    document.getElementById('navbar-root').innerHTML = renderNavbar('race-weekend.html');
-    document.getElementById('footer-root').innerHTML = renderFooter();
-  </script>
+
+
 </body>
 
 </html>

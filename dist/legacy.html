@@ -9,7 +9,9 @@
     content="Explore the defining moments, legendary drivers, historic cars, and iconic rivalries of Formula 1.">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
     rel="stylesheet">
-  <link rel="stylesheet" crossorigin href="/assets/styles-Yw2xTk-D.css">
+  <script type="module" crossorigin src="/assets/legacy-CcItGVrf.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/f1data-CYHUHGUy.js">
+  <link rel="stylesheet" crossorigin href="/assets/f1data-B_jtZwbz.css">
 </head>
 
 <body>
@@ -76,145 +78,7 @@
     </div>
   </main>
 
-  <div id="footer-root"></div>
-  <script src="f1data.js"></script>
-  <script>
-    // Document Ready Initialization
-    document.getElementById('navbar-root').innerHTML = renderNavbar('legacy.html');
-    document.getElementById('footer-root').innerHTML = renderFooter();
-
-    function renderLegacyTeamTag(tag) {
-      return `<span class="legacy-tag">${tag}</span>`;
-    }
-
-    // ─── 1. TIMELINE ───
-    document.getElementById('timeline-root').innerHTML = F1Data.legacy.timeline.map((t, i) => `
-      <div class="timeline-item animate-in" style="animation-delay:${i * 0.1}s">
-        <div class="timeline-dot"></div>
-        <div class="timeline-content">
-          <div class="timeline-year">${t.year}</div>
-          <h3 class="timeline-title">${t.title}</h3>
-          ${t.image ? `<img src="${t.image}" alt="${t.title} – ${t.year} – Formula 1" loading="lazy" class="timeline-image" data-year="${t.year}" onerror="this.classList.add('legacy-fallback');">` : ''}
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-            <span style="font-size:10px;padding:2px 6px;border:1px solid rgba(197,160,79,0.3);border-radius:4px;color:#C5A04F;">${t.era}</span>
-            ${t.tags.map(tag => renderLegacyTeamTag(tag)).join('')}
-          </div>
-          <p class="timeline-desc">${t.desc}</p>
-          <div class="timeline-insight"><strong>Why It Matters:</strong> ${t.insight}</div>
-        </div>
-      </div>
-    `).join('');
-
-    // ─── 2. RIVALRIES ───
-    document.getElementById('rivalries-root').innerHTML = F1Data.legacy.rivalries.map((r, i) => `
-      <div class="rivalry-card animate-in" style="animation-delay:${i * 0.1}s">
-        <div class="rivalry-dual">
-          <div class="rivalry-side">
-            <img src="${r.img1}" alt="${r.driver1} – ${r.era} – Formula 1" loading="lazy" data-year="${r.era.replace(/[^0-9]/g, '').slice(0, 4) || 'Historic'}" onerror="this.classList.add('legacy-fallback');" style="width:80px;height:80px;border-radius:50%;margin-bottom:12px;border:2px solid rgba(255,255,255,0.1);object-fit:cover;">
-            <h4>${r.driver1}</h4>
-          </div>
-          <div class="rivalry-vs">VS</div>
-          <div class="rivalry-side">
-            <img src="${r.img2}" alt="${r.driver2} – ${r.era} – Formula 1" loading="lazy" data-year="${r.era.replace(/[^0-9]/g, '').slice(0, 4) || 'Historic'}" onerror="this.classList.add('legacy-fallback');" style="width:80px;height:80px;border-radius:50%;margin-bottom:12px;border:2px solid rgba(255,255,255,0.1);object-fit:cover;">
-            <h4>${r.driver2}</h4>
-          </div>
-        </div>
-        <div class="rivalry-info">
-          <div style="display:flex;gap:8px;margin-bottom:12px;justify-content:center;flex-wrap:wrap;">
-            ${r.tags.map(tag => renderLegacyTeamTag(tag)).join('')}
-          </div>
-          ${r.summary}
-        </div>
-      </div>
-    `).join('');
-
-    // ─── 3. HISTORIC CARS ───
-    document.getElementById('cars-root').innerHTML = F1Data.legacy.historicCars.map((c, i) => `
-      <div class="historic-car animate-in" style="animation-delay:${i * 0.1}s">
-        <div class="historic-car-img" style="background: url('${c.image}') center/cover no-repeat;" role="img" aria-label="${c.name} – ${c.era} – Formula 1"></div>
-        <div class="historic-car-body">
-          <div class="historic-car-title">${c.name}</div>
-          <div class="historic-car-inno">Key Tech: ${c.innovation}</div>
-          <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
-            <span style="font-size:10px;padding:2px 6px;border:1px solid rgba(197,160,79,0.3);border-radius:4px;color:#C5A04F;">${c.era}</span>
-            ${c.tags.map(tag => renderLegacyTeamTag(tag)).join('')}
-          </div>
-          <div class="historic-car-desc">${c.description}</div>
-        </div>
-      </div>
-    `).join('');
-
-    // ─── 4. HALL OF FAME ───
-    document.getElementById('hall-root').innerHTML = F1Data.legacy.legends.map((h, i) => `
-      <div class="hall-card animate-in" style="animation-delay:${i * 0.1}s">
-        <div class="hall-image-wrapper" style="text-align:center;margin-bottom:20px;">
-           <img src="${h.image}" alt="${h.name} – ${h.era} – Formula 1" loading="lazy" data-year="${h.era.split('-')[0] || 'Legend'}" onerror="this.classList.add('legacy-fallback');" style="width:120px;height:120px;object-fit:cover;border-radius:50%;border:2px solid #C5A04F;">
-        </div>
-        <div class="hall-titles">${h.titles}</div>
-        <div style="font-size:10px;color:#C5A04F;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px">World Titles</div>
-        <div class="hall-name">${h.name}</div>
-        <div class="hall-highlight">${h.highlightStats}</div>
-        <div style="display:flex;gap:8px;margin-bottom:16px;justify-content:center;flex-wrap:wrap;">
-          ${h.tags.map(tag => renderLegacyTeamTag(tag)).join('')}
-        </div>
-        <div class="hall-quote">${h.quote.replace(/"/g, '&quot;')}</div>
-      </div>
-    `).join('');
-
-    // ─── 5. CULTURE ───
-    document.getElementById('culture-root').innerHTML = F1Data.legacy.culture.map((c, i) => `
-      <div class="reg-card animate-in" style="animation-delay:${i * 0.1}s; border-color: rgba(197, 160, 79, 0.2)">
-        <h3 style="color:#C5A04F; font-size:16px; margin-bottom:8px;">${c.title}</h3>
-        <p>${c.desc}</p>
-        <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;">
-          ${c.tags.map(tag => renderLegacyTeamTag(tag)).join('')}
-        </div>
-      </div>
-    `).join('');
-
-    // ─── 6. TRIVIA ───
-    document.getElementById('trivia-root').innerHTML = F1Data.legacy.trivia.map((t, i) => `
-      <div class="trivia-card animate-in" style="animation-delay:${i * 0.1}s" role="button" aria-expanded="false" aria-controls="trivia-answer-${i}" tabindex="0" onclick="this.classList.toggle('flipped'); this.setAttribute('aria-expanded', this.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');">
-        <div class="trivia-inner">
-          <div class="trivia-front" aria-hidden="false">
-            <div class="trivia-icon">❓</div>
-            <div class="trivia-q">${t.q}</div>
-            <div style="font-size:10px; color:var(--text-tertiary); margin-top:12px; text-transform:uppercase;">Click to Reveal</div>
-          </div>
-          <div class="trivia-back" id="trivia-answer-${i}" aria-hidden="true">
-            <div class="trivia-icon">💡</div>
-            <div class="trivia-a">${t.a}</div>
-            <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-top:12px;">${t.context}</div>
-            <div style="display:flex;gap:8px;margin-top:12px;justify-content:center;flex-wrap:wrap;">
-              ${t.tags.map(tag => renderLegacyTeamTag(tag)).join('')}
-            </div>
-          </div>
-        </div>
-      </div>
-    `).join('');
-
-    // ─── ANIMATIONS ───
-    animateOnScroll();
-
-    // Timeline Scroll Animation (Lighting up the center line)
-    const timelineLine = document.querySelector('.timeline');
-    if (timelineLine) {
-      window.addEventListener('scroll', () => {
-        const rect = timelineLine.getBoundingClientRect();
-        const scrollPercentage = Math.max(0, Math.min(1, (window.innerHeight - rect.top) / (rect.height + window.innerHeight)));
-        timelineLine.style.setProperty('--scroll-progress', (scrollPercentage * 100) + '%');
-      });
-    }
-
-    // Smooth scroll for timeline button
-    const exploreBtn = document.querySelector('.legacy-btn');
-    if (exploreBtn) {
-      exploreBtn.addEventListener('click', function (e) {
-        e.preventDefault();
-        document.querySelector('#timeline').scrollIntoView({ behavior: 'smooth' });
-      });
-    }
-  </script>
+  <div id="footer-root"></div>
 </body>
 
 </html>

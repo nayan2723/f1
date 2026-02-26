@@ -12,15 +12,16 @@
 <body class="theme-dark">
   <div class="fixed-background"></div>
 
-  <!-- AUTH MODAL MOVED TO REACT -->
+
   <!-- TEAM SELECTION MODAL -->
   <div id="team-modal" class="modal-overlay hidden">
-    <div class="auth-card glass-card" style="max-width: 500px;">
-      <div class="auth-header">
+    <div class="glass-card" style="max-width: 500px; padding: 32px;">
+      <div class="modal-header-container"
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <h2>Select Favorite Team</h2>
         <button id="team-close" class="modal-close">&times;</button>
       </div>
-      <div class="auth-body">
+      <div class="modal-body-content">
         <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; text-align: center;">Personalize
           your F1 Insight experience.</p>
         <div class="team-grid-select" id="team-selector-grid">
@@ -34,8 +35,8 @@
 
   <main class="main-content">
     <header class="section-header" style="text-align: center; margin-bottom: 40px;">
-      <h1 class="page-title text-gradient-animate">Driver Comparison</h1>
-      <p class="section-subtitle">Head-to-head intelligence across the 2026 Grid</p>
+      <h1 class="page-title text-gradient-animate">HEAD-TO-HEAD TELEMETRY</h1>
+      <p class="section-subtitle">Comparative performance analytics across the 2026 Grid</p>
     </header>
 
     <!-- Comparison Controls -->
@@ -83,12 +84,9 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <h3 style="margin: 0; font-family: 'Orbitron'; font-size: 16px;">Metrics Head-to-Head</h3>
 
-            <div class="tooltip-container" id="save-compare-container">
-              <button id="save-compare-btn" class="btn-primary btn-sm" disabled style="opacity: 0.5;">
-                ⭐ Save Comparison
-              </button>
-              <span class="tooltip-text" id="save-compare-tooltip">Log in to save comparison</span>
-            </div>
+            <button id="save-compare-btn" class="btn-primary btn-sm">
+              ⭐ Save Comparison
+            </button>
           </div>
           <div id="compare-bars-container" style="display: flex; flex-direction: column; gap: 20px;">
             <!-- JS Injected Bars -->
@@ -106,15 +104,15 @@
 
   <div id="footer-root"></div>
 
-  <script src="f1data.js"></script>
+  <script type="module" src="f1data.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script type="module" src="auth.js"></script>
+
 
   <!-- Vite Entry for React Islands -->
   <script type="module" src="lib/components/mountReact.jsx"></script>
 
   <script type="module" src="compare.js"></script>
-  <script>
+  <script type="module">
     // ── Render nav & footer ──
     document.getElementById('navbar-root').innerHTML = renderNavbar('compare.html');
     document.getElementById('footer-root').innerHTML = renderFooter();

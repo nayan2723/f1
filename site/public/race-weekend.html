@@ -12,15 +12,16 @@
 <body class="theme-dark">
   <div class="fixed-background"></div>
 
-  <!-- AUTH MODAL MOVED TO REACT -->
+
   <!-- TEAM SELECTION MODAL -->
   <div id="team-modal" class="modal-overlay hidden">
-    <div class="auth-card glass-card" style="max-width: 500px;">
-      <div class="auth-header">
+    <div class="glass-card" style="max-width: 500px; padding: 32px;">
+      <div class="modal-header-container"
+        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
         <h2>Select Favorite Team</h2>
         <button id="team-close" class="modal-close">&times;</button>
       </div>
-      <div class="auth-body">
+      <div class="modal-body-content">
         <p style="font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; text-align: center;">Personalize
           your F1 Insight experience.</p>
         <div class="team-grid-select" id="team-selector-grid">
@@ -81,11 +82,11 @@
 
   <div id="footer-root"></div>
 
-  <script src="f1data.js"></script>
+  <script type="module" src="f1data.js"></script>
   <script type="module" src="/lib/components/mountReact.jsx"></script>
-  <script type="module" src="auth.js"></script>
+
   <script type="module" src="livetiming.js"></script>
-  <script>
+  <script type="module">
     // ── Render nav & footer ──
     document.getElementById('navbar-root').innerHTML = renderNavbar('race-weekend.html');
     document.getElementById('footer-root').innerHTML = renderFooter();

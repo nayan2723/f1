@@ -2,43 +2,48 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Drivers – F1 Insight 2026</title>
-    <meta name="description"
-        content="Complete 2026 F1 driver intelligence grid – all 22 drivers with stats, win probability, and analytics">
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Drivers – F1 Insight 2026</title>
+  <meta name="description"
+    content="Complete 2026 F1 driver intelligence grid – all 22 drivers with stats, win probability, and analytics">
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
-    <div id="navbar-root"></div>
-    <main class="main-content">
-        <header class="page-header animate-in">
-            <h1 class="page-title">DRIVER INTELLIGENCE</h1>
-            <p class="page-subtitle">Complete analytics for all 22 drivers competing in the 2026 Formula 1 World
-                Championship</p>
-        </header>
-        <div class="driver-grid" id="driver-grid"></div>
-    </main>
-    <div id="footer-root"></div>
-    <script src="f1data.js"></script>
-    <script>
-        document.getElementById('navbar-root').innerHTML = renderNavbar('drivers.html');
-        document.getElementById('footer-root').innerHTML = renderFooter();
+  <div id="navbar-root"></div>
+  <main class="main-content">
+    <header class="page-header animate-in">
+      <h1 class="page-title">DRIVER INTELLIGENCE</h1>
+      <p class="page-subtitle">Comprehensive telemetric profiles and performance analytics for all 22 drivers on the
+        2026 grid.</p>
+    </header>
 
-        const sorted = F1Data.getSortedDrivers();
-        document.getElementById('driver-grid').innerHTML = sorted.map((d, i) => {
-            const tc = F1Data.getTeamColor(d.team);
-            const teamName = F1Data.getTeamName(d.team);
-            const teamAbbr = F1Data.getTeamAbbr(d.team);
-            const recentHtml = d.recent.map(r => {
-                let cls = '';
-                const n = parseInt(r);
-                if (!isNaN(n)) { if (n <= 3) cls = 'top3'; else if (n <= 5) cls = 'top5'; else if (n <= 10) cls = 'top10'; }
-                return `<span class="result-badge ${cls}">${r}</span>`;
-            }).join('');
-            return `
-      <div class="driver-card animate-in" style="animation-delay:${i * 0.05}s">
+    <!-- React Mount Point for Personality Engine -->
+    <div id="personality-quiz-root" style="position: relative; z-index: 9999;"></div>
+
+    <div class="driver-grid" id="driver-grid"></div>
+  </main>
+  <div id="footer-root"></div>
+  <script type="module" src="f1data.js"></script>
+  <script type="module" src="/lib/components/mountReact.jsx"></script>
+  <script type="module">
+    document.getElementById('navbar-root').innerHTML = renderNavbar('drivers.html');
+    document.getElementById('footer-root').innerHTML = renderFooter();
+
+    const sorted = F1Data.getSortedDrivers();
+    document.getElementById('driver-grid').innerHTML = sorted.map((d, i) => {
+      const tc = F1Data.getTeamColor(d.team);
+      const teamName = F1Data.getTeamName(d.team);
+      const teamAbbr = F1Data.getTeamAbbr(d.team);
+      const recentHtml = d.recent.map(r => {
+        let cls = '';
+        const n = parseInt(r);
+        if (!isNaN(n)) { if (n <= 3) cls = 'top3'; else if (n <= 5) cls = 'top5'; else if (n <= 10) cls = 'top10'; }
+        return `<span class="result-badge ${cls}">${r}</span>`;
+      }).join('');
+      return `
+      <div class="driver-card animate-in" data-code="${d.code}" style="animation-delay:${i * 0.05}s">
         <div class="driver-card-accent" style="background:${tc}"></div>
         <div class="driver-card-body">
           <div class="driver-card-header">
@@ -67,11 +72,11 @@
           <div class="recent-results">${recentHtml}</div>
         </div>
       </div>`;
-        }).join('');
+    }).join('');
 
-        animateProgressBars();
-        animateOnScroll();
-    </script>
+    animateProgressBars();
+    animateOnScroll();
+  </script>
 </body>
 
 </html>

@@ -114,22 +114,32 @@ const F1Data = {
 // Export to window
 window.F1Data = F1Data;
 
+// Expose utilities to window
+window.renderNavbar = renderNavbar;
+window.renderFooter = renderFooter;
+window.initCountdown = initCountdown;
+window.animateOnScroll = animateOnScroll;
+window.animateProgressBars = animateProgressBars;
+window.initGlobalScrollReveal = initGlobalScrollReveal;
+window.initScrollProgress = initScrollProgress;
+window.initTabs = initTabs;
+
 // ─── Navigation HTML Generator ───
 function renderNavbar(activePage) {
   const pages = [
-    { href: 'index.html', label: 'Home' },
-    { href: 'drivers.html', label: 'Drivers' },
-    { href: 'teams.html', label: 'Teams' },
-    { href: 'cars.html', label: 'Cars' },
-    { href: 'circuits.html', label: 'Circuits' },
-    { href: 'regulations.html', label: 'Regulations' },
-    { href: 'compare.html', label: 'Compare' },
-    { href: 'race-weekend.html', label: 'Live Race' },
-    { href: 'predictions.html', label: 'Predictions' },
-    { href: 'legacy.html', label: 'Legacy' },
+    { href: '/index.html', label: 'Home' },
+    { href: '/drivers.html', label: 'Drivers' },
+    { href: '/teams.html', label: 'Teams' },
+    { href: '/cars.html', label: 'Cars' },
+    { href: '/circuits.html', label: 'Circuits' },
+    { href: '/regulations.html', label: 'Regulations' },
+    { href: '/compare.html', label: 'Compare' },
+    { href: '/race-weekend.html', label: 'Live Race' },
+    { href: '/predictions.html', label: 'Predictions' },
+    { href: '/legacy.html', label: 'Legacy' },
   ];
   const links = pages.map(p =>
-    `<a href="${p.href}" class="${p.href === activePage ? 'active' : ''}">${p.label}</a>`
+    `<a href="${p.href}" class="${p.href.endsWith('/' + activePage) || p.href === activePage ? 'active' : ''}">${p.label}</a>`
   ).join('');
 
   return `
@@ -145,9 +155,6 @@ function renderNavbar(activePage) {
     </div>
     <div class="nav-notifications" id="nav-notifications-container">
       <!-- Notification bell will go here -->
-    </div>
-    <div class="nav-auth" id="nav-auth-container">
-      <!-- Auth state will be injected here by auth.js -->
     </div>
   </nav>
   <div class="scroll-progress"><div id="scroll-progress-bar"></div></div>`;
@@ -368,3 +375,12 @@ F1Data.legacy = {
     'Williams': '/assets/legacy/logos/williams.png'
   }
 };
+
+// Expose to window for legacy scripts
+if (typeof window !== 'undefined') {
+  window.F1Data = F1Data;
+}
+
+// Support ESM exports for Vite
+export default F1Data;
+export { F1Data };
